@@ -1,0 +1,58 @@
+<div class="max-w-6xl mx-auto p-6">
+  <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Pagy vs Kaminari Performance Comparison</h1>
+  
+  <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-700">Welcome to the Pagination Performance Test</h2>
+    <p class="text-gray-600 mb-6">
+      This application compares the performance between Pagy and Kaminari gems for pagination in Rails.
+      We have created <%= Article.count %> articles to test with.
+    </p>
+    
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+        <h3 class="text-xl font-semibold text-blue-800 mb-3">Pagy Demo</h3>
+        <p class="text-blue-600 mb-4">Optimized Pagy with Countless & JS navigation</p>
+        <%= link_to "Try Pagy", performance_pagy_demo_path, 
+            class: "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
+      </div>
+      
+      <div class="bg-green-50 p-6 rounded-lg border border-green-200">
+        <h3 class="text-xl font-semibold text-green-800 mb-3">Kaminari Demo</h3>
+        <p class="text-green-600 mb-4">Traditional pagination using Kaminari</p>
+        <%= link_to "Try Kaminari", performance_kaminari_demo_path, 
+            class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
+      </div>
+      
+      <div class="bg-purple-50 p-6 rounded-lg border border-purple-200">
+        <h3 class="text-xl font-semibold text-purple-800 mb-3">Benchmark Test</h3>
+        <p class="text-purple-600 mb-4">Comprehensive performance benchmarks</p>
+        <%= link_to "Run Benchmarks", performance_benchmark_path, 
+            class: "bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-gray-50 p-6 rounded-lg">
+    <h3 class="text-lg font-semibold mb-3 text-gray-700">🔬 Comprehensive Testing Features:</h3>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div>
+        <h4 class="font-semibold text-gray-600 mb-2">Pagy Optimizations</h4>
+        <ul class="list-disc pl-6 space-y-1 text-gray-600">
+          <li>🚀 Countless pagination (no COUNT queries)</li>
+          <li>⚡ JavaScript-powered navigation helpers</li>
+          <li>💾 Memory usage analysis across different pages</li>
+          <li>📊 Iterations per second (IPS) benchmarking</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold text-gray-600 mb-2">Advanced Features</h4>
+        <ul class="list-disc pl-6 space-y-1 text-gray-600">
+          <li>Multi-page testing (pages 1, 50, 100, 200)</li>
+          <li>Statistical analysis with standard deviation</li>
+          <li>Real-world scenarios with <%= number_with_delimiter(Article.count) %> records</li>
+          <li>Database indexing for optimal performance</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
