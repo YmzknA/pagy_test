@@ -16,6 +16,12 @@ Rails.application.routes.draw do
   get "performance/benchmark"
   get "performance/comprehensive_benchmark"
   
+  # Simple verification pages
+  get "verification/pagy_standard_simple"
+  get "verification/pagy_countless_simple" 
+  get "verification/kaminari_standard_simple"
+  get "verification/kaminari_without_count_simple"
+  
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
