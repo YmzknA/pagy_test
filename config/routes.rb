@@ -2,10 +2,19 @@ Rails.application.routes.draw do
   root "performance#index"
   
   get "performance/index"
-  get "performance/pagy_demo"
-  get "performance/kaminari_demo"
-  get "performance/pagy_optimized_demo"
-  get "performance/kaminari_optimized_demo"
+  
+  # 各ページネーション手法の独立したデモ
+  get "performance/pagy_standard_demo"
+  get "performance/pagy_countless_demo" 
+  get "performance/kaminari_standard_demo"
+  get "performance/kaminari_without_count_demo"
+  get "performance/keyset_pagination_demo"
+  
+  # 既存のルート（互換性維持）
+  get "performance/pagy_demo", to: "performance#pagy_standard_demo"
+  get "performance/kaminari_demo", to: "performance#kaminari_standard_demo"
+  get "performance/keyset_demo", to: "performance#keyset_pagination_demo"
+  
   get "performance/benchmark"
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
