@@ -8,14 +8,14 @@
 
 <% queries = [
   {
-    name: "COUNT Query",
+    name: "1. COUNT Query (pagy呼び出し時)",
     sql: 'SELECT COUNT(*) FROM "articles"',
-    note: "総件数を取得してページネーション情報を計算"
+    note: "pagy() 呼び出し時に即座に実行 - 総件数を取得してページネーション情報を計算"
   },
   {
-    name: "SELECT Query", 
+    name: "2. SELECT Query (遅延実行)", 
     sql: 'SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2',
-    note: "指定ページの記事データを取得 (LIMIT: #{params[:per_page] || 25}, OFFSET: #{((params[:page] || 1).to_i - 1) * (params[:per_page] || 25).to_i})"
+    note: ".to_a を呼んだ時に実行される記事データ取得 (LIMIT: #{params[:per_page] || 25}, OFFSET: #{((params[:page] || 1).to_i - 1) * (params[:per_page] || 25).to_i})"
   }
 ] %>
 

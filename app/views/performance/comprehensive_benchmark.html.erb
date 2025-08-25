@@ -49,35 +49,39 @@
         <div class="grid md:grid-cols-2 gap-6 mb-6">
           <div class="bg-white p-4 rounded border">
             <h4 class="font-semibold text-blue-700 mb-2">Pagy 標準版</h4>
-            <div class="text-xs space-y-2">
-              <div><code class="bg-blue-50 p-1 rounded">SELECT COUNT(*) FROM "articles"</code></div>
-              <div><code class="bg-blue-50 p-1 rounded">SELECT * FROM "articles" ... LIMIT 25 OFFSET ?</code></div>
-              <div class="text-blue-600">⚠️ 2つのクエリを実行（COUNTが重い）</div>
+            <div class="text-xs space-y-1">
+              <div class="text-blue-800 font-semibold">実行順序:</div>
+              <div>1. <code class="bg-blue-50 p-1 rounded text-xs">SELECT COUNT(*) FROM "articles"</code></div>
+              <div>2. <code class="bg-blue-50 p-1 rounded text-xs">SELECT * ... LIMIT 25 OFFSET ?</code></div>
+              <div class="text-blue-600 mt-2">⚠️ COUNT即座実行 → データ遅延実行</div>
             </div>
           </div>
           
           <div class="bg-white p-4 rounded border">
             <h4 class="font-semibold text-purple-700 mb-2">Pagy Countless</h4>
-            <div class="text-xs space-y-2">
-              <div><code class="bg-purple-50 p-1 rounded">SELECT * FROM "articles" ... LIMIT 26 OFFSET ?</code></div>
-              <div class="text-purple-600">✅ 1つのクエリのみ（+1件で次ページ判定）</div>
+            <div class="text-xs space-y-1">
+              <div class="text-purple-800 font-semibold">実行順序:</div>
+              <div>1. <code class="bg-purple-50 p-1 rounded text-xs">SELECT * ... LIMIT 26 OFFSET ?</code></div>
+              <div class="text-purple-600 mt-2">✅ 1クエリのみ（+1件で次ページ判定）</div>
             </div>
           </div>
           
           <div class="bg-white p-4 rounded border">
             <h4 class="font-semibold text-green-700 mb-2">Kaminari 標準版</h4>
-            <div class="text-xs space-y-2">
-              <div><code class="bg-green-50 p-1 rounded">SELECT * FROM "articles" ... LIMIT 25 OFFSET ?</code></div>
-              <div><code class="bg-green-50 p-1 rounded">SELECT COUNT(*) FROM (SELECT 1 ... LIMIT 25000) subquery</code></div>
-              <div class="text-green-600">⚠️ 2つのクエリ（subqueryで最適化済み）</div>
+            <div class="text-xs space-y-1">
+              <div class="text-green-800 font-semibold">実行順序:</div>
+              <div>1. <code class="bg-green-50 p-1 rounded text-xs">SELECT * ... LIMIT 25 OFFSET ?</code></div>
+              <div>2. <code class="bg-green-50 p-1 rounded text-xs">COUNT(*) FROM (SELECT 1 ... LIMIT 25000)</code></div>
+              <div class="text-green-600 mt-2">⚠️ データ遅延実行 → COUNT必要時実行</div>
             </div>
           </div>
           
           <div class="bg-white p-4 rounded border">
             <h4 class="font-semibold text-red-700 mb-2">Kaminari without_count</h4>
-            <div class="text-xs space-y-2">
-              <div><code class="bg-red-50 p-1 rounded">SELECT * FROM "articles" ... LIMIT 25 OFFSET ?</code></div>
-              <div class="text-red-600">✅ 1つのクエリのみ（総件数不明）</div>
+            <div class="text-xs space-y-1">
+              <div class="text-red-800 font-semibold">実行順序:</div>
+              <div>1. <code class="bg-red-50 p-1 rounded text-xs">SELECT * ... LIMIT 25 OFFSET ?</code></div>
+              <div class="text-red-600 mt-2">✅ 1クエリのみ（総件数情報なし）</div>
             </div>
           </div>
         </div>
