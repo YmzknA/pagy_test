@@ -24,7 +24,9 @@ module BenchmarkHelper
           clear_query_cache
           pagy_obj, articles = pagy(Article.order(:id), items: per_page, page: page_param)
           articles.to_a
-          render_to_string('performance/_unified_pagy_content', locals: { pagy_obj: pagy_obj, articles: articles })
+          # Inline rendering instead of partial
+          ids_list = articles.map(&:id).join(', ')
+          pagy_nav_html = view_context.pagy_nav(pagy_obj)
         end
       end
     end
@@ -57,7 +59,9 @@ module BenchmarkHelper
           clear_query_cache
           pagy_obj, articles = pagy_countless(Article.order(:id), items: per_page, page: page_param)
           articles.to_a
-          render_to_string('performance/_unified_pagy_content', locals: { pagy_obj: pagy_obj, articles: articles })
+          # Inline rendering instead of partial
+          ids_list = articles.map(&:id).join(', ')
+          pagy_nav_html = view_context.pagy_nav(pagy_obj)
         end
       end
     end
@@ -91,7 +95,9 @@ module BenchmarkHelper
           clear_query_cache
           articles = Article.order(:id).page(page_param).per(per_page)
           articles.to_a
-          render_to_string('performance/_unified_kaminari_content', locals: { articles: articles })
+          # Inline rendering instead of partial
+          ids_list = articles.map(&:id).join(', ')
+          paginate_html = view_context.paginate(articles)
         end
       end
     end
@@ -125,7 +131,11 @@ module BenchmarkHelper
           clear_query_cache
           articles = Article.order(:id).page(page_param).per(per_page).without_count
           articles.to_a
-          render_to_string('performance/_unified_kaminari_content', locals: { articles: articles })
+          # Inline rendering instead of partial
+          ids_list = articles.map(&:id).join(', ')
+          # Use appropriate pagination method for without_count
+          prev_link = view_context.link_to_previous_page(articles, "← Previous")
+          next_link = view_context.link_to_next_page(articles, "Next →")
         end
       end
     end
