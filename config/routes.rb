@@ -13,8 +13,6 @@ Rails.application.routes.draw do
   get "performance/pagy_demo", to: "performance#pagy_standard_demo"
   get "performance/kaminari_demo", to: "performance#kaminari_standard_demo"
   
-  get "performance/benchmark"
-  get "performance/comprehensive_benchmark"
   
   # Simple verification pages
   get "verification/pagy_standard_simple"
