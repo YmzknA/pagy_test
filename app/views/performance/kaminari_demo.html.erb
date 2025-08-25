@@ -1,69 +1,69 @@
 <div class="max-w-6xl mx-auto p-6">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-green-800">Kaminari Pagination Demo</h1>
-    <%= link_to "← Back to Home", performance_index_path, 
+    <h1 class="text-3xl font-bold text-green-800">Kaminari ページネーションデモ</h1>
+    <%= link_to "← ホームに戻る", performance_index_path, 
         class: "bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
   </div>
   
   <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-    <h2 class="text-xl font-semibold text-green-800 mb-2">Performance Benchmark Results</h2>
+    <h2 class="text-xl font-semibold text-green-800 mb-2">パフォーマンスベンチマーク結果</h2>
     <% if @duration.is_a?(Hash) %>
       <!-- Data Only Performance -->
       <div class="mb-6">
-        <h3 class="text-lg font-semibold text-green-700 mb-3">📊 Data Retrieval Performance (50 iterations)</h3>
+        <h3 class="text-lg font-semibold text-green-700 mb-3">📊 データ取得パフォーマンス (100回実行)</h3>
         <div class="grid md:grid-cols-2 gap-4 text-sm">
           <div class="bg-white p-3 rounded">
-            <strong class="text-green-700">Kaminari Standard (data only):</strong><br>
+            <strong class="text-green-700">Kaminari 標準 (データのみ):</strong><br>
             <span class="text-lg font-bold text-green-600">
               <%= sprintf("%.4f", @duration[:data_only][0] * 1000) %> ms
             </span>
           </div>
           <div class="bg-white p-3 rounded">
-            <strong class="text-green-700">Kaminari without_count (data only):</strong><br>
+            <strong class="text-green-700">Kaminari without_count (データのみ):</strong><br>
             <span class="text-lg font-bold text-orange-600">
               <%= sprintf("%.4f", @duration[:data_only][1] * 1000) %> ms
             </span>
           </div>
         </div>
         <div class="text-xs text-gray-600 mt-2">
-          Data improvement: <%= sprintf('%.1f', ((@duration[:data_only][0] - @duration[:data_only][1]) / @duration[:data_only][0] * 100).abs) %>% faster without count
+          データ取得の改善: <%= sprintf('%.1f', ((@duration[:data_only][0] - @duration[:data_only][1]) / @duration[:data_only][0] * 100).abs) %>% without_countが高速
         </div>
       </div>
 
       <!-- Data + View Performance -->
       <div class="mb-6">
-        <h3 class="text-lg font-semibold text-green-700 mb-3">🎨 Total Performance (Data + View Rendering)</h3>
+        <h3 class="text-lg font-semibold text-green-700 mb-3">🎨 合計パフォーマンス (データ取得 + ビュー描画)</h3>
         <div class="grid md:grid-cols-2 gap-4 text-sm">
           <div class="bg-white p-3 rounded">
-            <strong class="text-green-700">Kaminari Standard (total):</strong><br>
+            <strong class="text-green-700">Kaminari 標準 (合計):</strong><br>
             <span class="text-lg font-bold text-green-600">
               <%= sprintf("%.4f", @duration[:with_view][0] * 1000) %> ms
             </span>
           </div>
           <div class="bg-white p-3 rounded">
-            <strong class="text-green-700">Kaminari without_count (total):</strong><br>
+            <strong class="text-green-700">Kaminari without_count (合計):</strong><br>
             <span class="text-lg font-bold text-orange-600">
               <%= sprintf("%.4f", @duration[:with_view][1] * 1000) %> ms
             </span>
           </div>
         </div>
         <div class="text-xs text-gray-600 mt-2">
-          Total improvement: <%= sprintf('%.1f', ((@duration[:with_view][0] - @duration[:with_view][1]) / @duration[:with_view][0] * 100).abs) %>% faster without count
+          合計の改善: <%= sprintf('%.1f', ((@duration[:with_view][0] - @duration[:with_view][1]) / @duration[:with_view][0] * 100).abs) %>% without_countが高速
         </div>
       </div>
 
       <!-- View Overhead Analysis -->
       <div class="bg-yellow-50 p-4 rounded mb-4">
-        <h3 class="text-lg font-semibold text-yellow-700 mb-2">🔍 View Rendering Overhead</h3>
+        <h3 class="text-lg font-semibold text-yellow-700 mb-2">🔍 ビュー描画オーバーヘッド</h3>
         <div class="grid md:grid-cols-2 gap-4 text-sm">
           <div>
-            <strong class="text-yellow-700">Standard view overhead:</strong><br>
+            <strong class="text-yellow-700">標準ビューオーバーヘッド:</strong><br>
             <span class="text-yellow-600">
               <%= sprintf("%.4f", (@duration[:with_view][0] - @duration[:data_only][0]) * 1000) %> ms
             </span>
           </div>
           <div>
-            <strong class="text-yellow-700">without_count view overhead:</strong><br>
+            <strong class="text-yellow-700">without_countビューオーバーヘッド:</strong><br>
             <span class="text-yellow-600">
               <%= sprintf("%.4f", (@duration[:with_view][1] - @duration[:data_only][1]) * 1000) %> ms
             </span>
@@ -73,7 +73,7 @@
       
       <% if @benchmark_results %>
         <div class="bg-white p-4 rounded">
-          <h3 class="font-semibold text-gray-700 mb-2">Detailed Benchmark Output:</h3>
+          <h3 class="font-semibold text-gray-700 mb-2">詳細ベンチマーク結果:</h3>
           <pre class="text-xs text-gray-600 overflow-x-auto bg-gray-50 p-2 rounded">
 <%= capture do %>
 <% @benchmark_results.each_with_index do |result, idx| %>
@@ -94,15 +94,15 @@ end %>
     <% else %>
       <div class="grid md:grid-cols-3 gap-4 text-sm">
         <div class="bg-white p-3 rounded">
-          <strong class="text-green-700">Current Page:</strong><br>
+          <strong class="text-green-700">現在のページ:</strong><br>
           <span class="text-2xl font-bold text-green-600"><%= (local_assigns[:articles] || @articles).current_page %></span>
         </div>
         <div class="bg-white p-3 rounded">
-          <strong class="text-green-700">Mode:</strong><br>
+          <strong class="text-green-700">モード:</strong><br>
           <span class="text-lg font-bold text-green-600">without_count</span>
         </div>
         <div class="bg-white p-3 rounded">
-          <strong class="text-green-700">Items per page:</strong><br>
+          <strong class="text-green-700">1ページあたり:</strong><br>
           <span class="text-lg font-bold text-green-600">25</span>
         </div>
       </div>
@@ -110,21 +110,21 @@ end %>
   </div>
   
   <div class="bg-white shadow rounded-lg p-6">
-    <h2 class="text-xl font-semibold mb-4 text-gray-700">Articles (Paginated with Kaminari)</h2>
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">記事一覧 (Kaminariでページネーション)</h2>
     
     <% articles = local_assigns[:articles] || @articles %>
     
     <div class="mb-4 flex justify-center">
       <nav class="flex space-x-2">
         <% if articles.prev_page %>
-          <%= link_to "← Previous", performance_kaminari_demo_path(page: articles.prev_page), 
+          <%= link_to "← 前のページ", performance_kaminari_demo_path(page: articles.prev_page), 
               class: "px-3 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded" %>
         <% end %>
         
-        <span class="px-3 py-2 bg-green-500 text-white rounded">Page <%= articles.current_page %></span>
+        <span class="px-3 py-2 bg-green-500 text-white rounded">ページ <%= articles.current_page %></span>
         
         <% if articles.next_page %>
-          <%= link_to "Next →", performance_kaminari_demo_path(page: articles.next_page), 
+          <%= link_to "次のページ →", performance_kaminari_demo_path(page: articles.next_page), 
               class: "px-3 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded" %>
         <% end %>
       </nav>
@@ -133,10 +133,13 @@ end %>
     <div class="space-y-4">
       <% articles.each do |article| %>
         <div class="border border-gray-200 rounded p-4">
-          <h3 class="font-semibold text-lg text-gray-800"><%= article.title %></h3>
+          <div class="flex justify-between items-start mb-2">
+            <h4 class="font-semibold text-lg text-gray-800"><%= article.title %></h4>
+            <span class="text-sm text-gray-500 ml-4">ID: <%= article.id %></span>
+          </div>
           <p class="text-gray-600 mt-2"><%= truncate(article.content, length: 200) %></p>
           <div class="text-sm text-gray-500 mt-2">
-            Created: <%= article.created_at.strftime("%B %d, %Y") %>
+            作成日: <%= article.created_at.strftime("%Y年%m月%d日") %>
           </div>
         </div>
       <% end %>
@@ -145,14 +148,14 @@ end %>
     <div class="mt-6 flex justify-center">
       <nav class="flex space-x-2">
         <% if articles.prev_page %>
-          <%= link_to "← Previous", performance_kaminari_demo_path(page: articles.prev_page), 
+          <%= link_to "← 前のページ", performance_kaminari_demo_path(page: articles.prev_page), 
               class: "px-3 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded" %>
         <% end %>
         
-        <span class="px-3 py-2 bg-green-500 text-white rounded">Page <%= articles.current_page %></span>
+        <span class="px-3 py-2 bg-green-500 text-white rounded">ページ <%= articles.current_page %></span>
         
         <% if articles.next_page %>
-          <%= link_to "Next →", performance_kaminari_demo_path(page: articles.next_page), 
+          <%= link_to "次のページ →", performance_kaminari_demo_path(page: articles.next_page), 
               class: "px-3 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded" %>
         <% end %>
       </nav>
@@ -160,7 +163,7 @@ end %>
   </div>
   
   <div class="mt-6 text-center">
-    <%= link_to "Compare with Pagy", performance_pagy_demo_path, 
+    <%= link_to "Pagyと比較", performance_pagy_demo_path, 
         class: "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
   </div>
 </div>
