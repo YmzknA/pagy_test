@@ -3,8 +3,8 @@
 <h2>テスト内容: COUNTクエリなしKaminari最適化版</h2>
 
 <% if @duration %>
-  <p>データのみ: <%= sprintf('%.4f', @duration[:data_only][0] * 1000) %> ms</p>
-  <p>ビュー含む: <%= sprintf('%.4f', @duration[:with_view][0] * 1000) %> ms</p>
+  <p>データのみ: <%= sprintf('%.4f', @duration[:data_only] * 1000) %> ms</p>
+  <p>ナビゲーション含む: <%= sprintf('%.4f', @duration[:with_nav] * 1000) %> ms</p>
 <% end %>
 
 <% if @articles %>
