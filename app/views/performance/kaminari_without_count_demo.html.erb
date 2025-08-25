@@ -1,80 +1,18 @@
-<% content_for(:footer_links) do %>
-  <%= link_to "Kaminari 標準版と比較", performance_kaminari_standard_demo_path, 
-      class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
+<h1>Kaminari without_countテスト</h1>
+
+<h2>テスト内容: COUNTクエリなしKaminari最適化版</h2>
+
+<% if @duration %>
+  <p>データのみ: <%= sprintf('%.4f', @duration[:data_only][0] * 1000) %> ms</p>
+  <p>ビュー含む: <%= sprintf('%.4f', @duration[:with_view][0] * 1000) %> ms</p>
 <% end %>
 
-<%= render 'large_data_test_links', 
-    path_helper: ->(page:) { performance_kaminari_without_count_demo_path(page: page) } %>
-
-<% page = params[:page]&.to_i || 1 %>
-<% per_page = params[:per_page]&.to_i || 25 %>
-<% offset = (page - 1) * per_page %>
-
-<% queries = [
-  {
-    name: "1. Preview Query (without_count呼び出し時)",
-    sql: "SELECT \"articles\".* FROM \"articles\" /* loading for pp */ ORDER BY \"articles\".\"id\" ASC LIMIT 12 OFFSET #{offset}",
-    note: "⏰ Article.page(#{page}).per(#{per_page}).without_count 呼び出し時 - プレビュー用"
-  },
-  {
-    name: "2. Main SELECT Query (articles.to_a呼び出し時)", 
-    sql: "SELECT \"articles\".* FROM \"articles\" ORDER BY \"articles\".\"id\" ASC LIMIT 26 OFFSET #{offset}",
-    note: "⏰ articles.to_a 実行時 - 実データ取得（COUNTクエリなし）"
-  }
-] %>
-
-<%= render 'single_benchmark_layout', 
-    color: 'red', 
-    title: 'Kaminari without_count版デモ', 
-    method_name: 'Kaminari without_count',
-    queries: queries do %>
-  
-  <h2 class="text-xl font-semibold mb-4 text-gray-700">記事一覧 (Kaminari without_count版)</h2>
-  
-  <div class="mb-4 flex justify-center">
-    <nav class="flex space-x-2">
-      <% if @articles.prev_page %>
-        <%= link_to "← 前のページ", performance_kaminari_without_count_demo_path(page: @articles.prev_page), 
-            class: "px-3 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded" %>
-      <% end %>
-      
-      <span class="px-3 py-2 bg-red-500 text-white rounded">ページ <%= @articles.current_page %></span>
-      
-      <% if @articles.next_page %>
-        <%= link_to "次のページ →", performance_kaminari_without_count_demo_path(page: @articles.next_page), 
-            class: "px-3 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded" %>
-      <% end %>
-    </nav>
-  </div>
-  
-  <div class="space-y-4">
-    <% @articles.each do |article| %>
-      <div class="border border-gray-200 rounded p-4">
-        <div class="flex justify-between items-start mb-2">
-          <h4 class="font-semibold text-lg text-gray-800"><%= article.title %></h4>
-          <span class="text-sm text-gray-500 ml-4">ID: <%= article.id %></span>
-        </div>
-        <p class="text-gray-600 mt-2"><%= truncate(article.content, length: 200) %></p>
-        <div class="text-sm text-gray-500 mt-2">
-          作成日: <%= article.created_at.strftime("%Y年%m月%d日") %>
-        </div>
-      </div>
-    <% end %>
-  </div>
-  
-  <div class="mt-6 flex justify-center">
-    <nav class="flex space-x-2">
-      <% if @articles.prev_page %>
-        <%= link_to "← 前のページ", performance_kaminari_without_count_demo_path(page: @articles.prev_page), 
-            class: "px-3 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded" %>
-      <% end %>
-      
-      <span class="px-3 py-2 bg-red-500 text-white rounded">ページ <%= @articles.current_page %></span>
-      
-      <% if @articles.next_page %>
-        <%= link_to "次のページ →", performance_kaminari_without_count_demo_path(page: @articles.next_page), 
-            class: "px-3 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded" %>
-      <% end %>
-    </nav>
+<% if @articles %>
+  <p>ID一覧: <%= @articles.map(&:id).join(', ') %></p>
+  <div>
+    <%= link_to_previous_page @articles, '前のページ' %>
+    <span>ページ <%= @articles.current_page %></span>
+    <%= link_to_next_page @articles, '次のページ' %>
   </div>
 <% end %>
+

@@ -47,42 +47,13 @@
     </div>
   </div>
   
-  <div class="bg-yellow-50 p-6 rounded-lg mb-8 border border-yellow-200">
-    <h2 class="text-xl font-semibold mb-4 text-yellow-800">🔍 シンプル検証ページ</h2>
-    <p class="text-yellow-700 mb-4">各手法の最もシンプルな実装で、実際のクエリ実行を確認できます。</p>
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <%= link_to "Pagy Standard 検証", verification_pagy_standard_simple_path, 
-          class: "bg-blue-500 hover:bg-blue-600 text-white text-center py-2 px-3 rounded text-sm" %>
-      <%= link_to "Pagy Countless 検証", verification_pagy_countless_simple_path, 
-          class: "bg-purple-500 hover:bg-purple-600 text-white text-center py-2 px-3 rounded text-sm" %>
-      <%= link_to "Kaminari Standard 検証", verification_kaminari_standard_simple_path, 
-          class: "bg-green-500 hover:bg-green-600 text-white text-center py-2 px-3 rounded text-sm" %>
-      <%= link_to "Kaminari without_count 検証", verification_kaminari_without_count_simple_path, 
-          class: "bg-red-500 hover:bg-red-600 text-white text-center py-2 px-3 rounded text-sm" %>
-    </div>
-  </div>
 
   <div class="bg-gray-50 p-6 rounded-lg">
-    <h3 class="text-lg font-semibold mb-3 text-gray-700">🔬 包括的なテスト機能:</h3>
-    <div class="grid md:grid-cols-2 gap-6">
-      <div>
-        <h4 class="font-semibold text-gray-600 mb-2">Pagy vs Kaminari 比較機能</h4>
-        <ul class="list-disc pl-6 space-y-1 text-gray-600">
-          <li>🚀 Countlessページネーション (COUNTクエリなし)</li>
-          <li>⚡ 標準ページネーション (COUNTクエリ付き)</li>
-          <li>💾 異なるページのメモリ使用量解析</li>
-          <li>📊 1秒あたりの反復数 (IPS) ベンチマーク</li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="font-semibold text-gray-600 mb-2">詳細なテスト機能</h4>
-        <ul class="list-disc pl-6 space-y-1 text-gray-600">
-          <li>マルチページテスト (ページ 1, 50, 100, 200)</li>
-          <li>両ライブラリの最適化版の性能比較</li>
-          <li><%= number_with_delimiter(Article.count) %> 件のレコードでの現実的なシナリオ</li>
-          <li>データ取得とビュー描画の個別測定</li>
-        </ul>
-      </div>
+    <h3 class="text-lg font-semibold mb-3 text-gray-700">🔬 パフォーマンス測定機能:</h3>
+    <div class="text-gray-600">
+      <p class="mb-3">
+        ページネーションライブラリの性能を測定し、最適化の参考にしてください。<%= number_with_delimiter(Article.count) %> 件のレコードでテストしています。
+      </p>
     </div>
   </div>
 </div>

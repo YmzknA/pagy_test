@@ -1,150 +1,19 @@
-<div class="max-w-6xl mx-auto p-6">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-blue-800">Pagy ページネーションデモ</h1>
-    <%= link_to "← ホームに戻る", performance_index_path, 
-        class: "bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
-  </div>
-  
-  <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-    <h2 class="text-xl font-semibold text-blue-800 mb-2">パフォーマンスベンチマーク結果</h2>
-    <% if @duration.is_a?(Hash) %>
-      <!-- Data Only Performance -->
-      <div class="mb-6">
-        <h3 class="text-lg font-semibold text-blue-700 mb-3">📊 データ取得パフォーマンス (100回実行)</h3>
-        <div class="grid md:grid-cols-2 gap-4 text-sm">
-          <div class="bg-white p-3 rounded">
-            <strong class="text-blue-700">Pagy 標準 (データのみ):</strong><br>
-            <span class="text-lg font-bold text-blue-600">
-              <%= sprintf("%.4f", @duration[:data_only][0] * 1000) %> ms
-            </span>
-          </div>
-          <div class="bg-white p-3 rounded">
-            <strong class="text-blue-700">Pagy Countless (データのみ):</strong><br>
-            <span class="text-lg font-bold text-green-600">
-              <%= sprintf("%.4f", @duration[:data_only][1] * 1000) %> ms
-            </span>
-          </div>
-        </div>
-        <div class="text-xs text-gray-600 mt-2">
-          データ取得の改善: <%= sprintf('%.1f', ((@duration[:data_only][0] - @duration[:data_only][1]) / @duration[:data_only][0] * 100).abs) %>% Countlessが高速
-        </div>
-      </div>
+<h1>Pagy 比較テスト</h1>
 
-      <!-- Data + View Performance -->
-      <div class="mb-6">
-        <h3 class="text-lg font-semibold text-blue-700 mb-3">🎨 合計パフォーマンス (データ取得 + ビュー描画)</h3>
-        <div class="grid md:grid-cols-2 gap-4 text-sm">
-          <div class="bg-white p-3 rounded">
-            <strong class="text-blue-700">Pagy 標準 (合計):</strong><br>
-            <span class="text-lg font-bold text-blue-600">
-              <%= sprintf("%.4f", @duration[:with_view][0] * 1000) %> ms
-            </span>
-          </div>
-          <div class="bg-white p-3 rounded">
-            <strong class="text-blue-700">Pagy Countless (合計):</strong><br>
-            <span class="text-lg font-bold text-green-600">
-              <%= sprintf("%.4f", @duration[:with_view][1] * 1000) %> ms
-            </span>
-          </div>
-        </div>
-        <div class="text-xs text-gray-600 mt-2">
-          合計の改善: <%= sprintf('%.1f', ((@duration[:with_view][0] - @duration[:with_view][1]) / @duration[:with_view][0] * 100).abs) %>% Countlessが高速
-        </div>
-      </div>
+<h2>テスト内容: Pagy標準版 vs Pagy Countless比較</h2>
 
-      <!-- View Overhead Analysis -->
-      <div class="bg-yellow-50 p-4 rounded mb-4">
-        <h3 class="text-lg font-semibold text-yellow-700 mb-2">🔍 ビュー描画オーバーヘッド</h3>
-        <div class="grid md:grid-cols-2 gap-4 text-sm">
-          <div>
-            <strong class="text-yellow-700">標準ビューオーバーヘッド:</strong><br>
-            <span class="text-yellow-600">
-              <%= sprintf("%.4f", (@duration[:with_view][0] - @duration[:data_only][0]) * 1000) %> ms
-            </span>
-          </div>
-          <div>
-            <strong class="text-yellow-700">Countlessビューオーバーヘッド:</strong><br>
-            <span class="text-yellow-600">
-              <%= sprintf("%.4f", (@duration[:with_view][1] - @duration[:data_only][1]) * 1000) %> ms
-            </span>
-          </div>
-        </div>
-      </div>
-      
-      <% if @benchmark_results %>
-        <div class="bg-white p-4 rounded">
-          <h3 class="font-semibold text-gray-700 mb-2">詳細ベンチマーク結果:</h3>
-          <pre class="text-xs text-gray-600 overflow-x-auto bg-gray-50 p-2 rounded">
-<%= capture do %>
-<% @benchmark_results.each_with_index do |result, idx| %>
-<%= case idx
-when 0
-  "Pagy 標準 (データのみ):        #{sprintf('%.6f', result.real)}s"
-when 1
-  "Pagy Countless (データのみ):    #{sprintf('%.6f', result.real)}s"
-when 2
-  "Pagy 標準 (データ + ビュー):    #{sprintf('%.6f', result.real)}s"
-when 3
-  "Pagy Countless (データ + ビュー): #{sprintf('%.6f', result.real)}s"
-end %>
+<% if @duration.is_a?(Hash) %>
+  <p>Pagy 標準 (データのみ): <%= sprintf("%.4f", @duration[:data_only][0] * 1000) %> ms</p>
+  <p>Pagy Countless (データのみ): <%= sprintf("%.4f", @duration[:data_only][1] * 1000) %> ms</p>
+  <p>Pagy 標準 (ビュー含む): <%= sprintf("%.4f", @duration[:with_view][0] * 1000) %> ms</p>
+  <p>Pagy Countless (ビュー含む): <%= sprintf("%.4f", @duration[:with_view][1] * 1000) %> ms</p>
 <% end %>
-<% end %></pre>
-        </div>
-      <% end %>
-    <% else %>
-      <div class="grid md:grid-cols-3 gap-4 text-sm">
-        <div class="bg-white p-3 rounded">
-          <strong class="text-blue-700">現在のページ:</strong><br>
-          <span class="text-2xl font-bold text-blue-600"><%= (local_assigns[:pagy] || @pagy).page %></span>
-        </div>
-        <div class="bg-white p-3 rounded">
-          <strong class="text-blue-700">レコード数:</strong><br>
-          <span class="text-2xl font-bold text-blue-600"><%= (local_assigns[:pagy] || @pagy).count || "Countless" %></span>
-        </div>
-        <div class="bg-white p-3 rounded">
-          <strong class="text-blue-700">1ページあたり:</strong><br>
-          <span class="text-2xl font-bold text-blue-600">25</span>
-        </div>
-      </div>
-    <% end %>
-  </div>
-  
-  <div class="bg-white shadow rounded-lg p-6">
-    <h2 class="text-xl font-semibold mb-4 text-gray-700">記事一覧 (Pagyでページネーション)</h2>
-    
-    <% pagy_obj = local_assigns[:pagy] || @pagy %>
-    <% articles = local_assigns[:articles] || @articles %>
-    
-    <div class="mb-4" id="pagy-nav-top">
-      <div class="text-sm text-gray-500 mb-2">
-        デバッグ: ページ <%= pagy_obj.page %>, 表示件数: <%= pagy_obj.limit %>, 
-        前: <%= pagy_obj.prev %>, 次: <%= pagy_obj.next %>
-      </div>
-      <%== pagy_nav(pagy_obj, link_extra: 'class="px-3 py-2 mx-1 rounded bg-blue-100 hover:bg-blue-200 text-blue-800"') %>
-    </div>
-    
-    <div class="space-y-4">
-      <% articles.each do |article| %>
-        <div class="border border-gray-200 rounded p-4">
-          <div class="flex justify-between items-start mb-2">
-            <h4 class="font-semibold text-lg text-gray-800"><%= article.title %></h4>
-            <span class="text-sm text-gray-500 ml-4">ID: <%= article.id %></span>
-          </div>
-          <p class="text-gray-600 mt-2"><%= truncate(article.content, length: 200) %></p>
-          <div class="text-sm text-gray-500 mt-2">
-            作成日: <%= article.created_at.strftime("%Y年%m月%d日") %>
-          </div>
-        </div>
-      <% end %>
-    </div>
-    
-    <div class="mt-6" id="pagy-nav-bottom">
-      <%== pagy_nav(pagy_obj, link_extra: 'class="px-3 py-2 mx-1 rounded bg-blue-100 hover:bg-blue-200 text-blue-800"') %>
-    </div>
-  </div>
-  
-  <div class="mt-6 text-center">
-    <%= link_to "Kaminariと比較", performance_kaminari_demo_path, 
-        class: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
-  </div>
-</div>
+
+<% pagy_obj = local_assigns[:pagy] || @pagy %>
+<% articles = local_assigns[:articles] || @articles %>
+
+<% if pagy_obj && articles %>
+  <p>ID一覧: <%= articles.map(&:id).join(', ') %></p>
+  <%== pagy_nav(pagy_obj) %>
+<% end %>
+

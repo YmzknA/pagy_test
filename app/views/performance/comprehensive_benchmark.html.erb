@@ -1,171 +1,56 @@
-<div class="max-w-6xl mx-auto p-6">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">包括的ベンチマーク結果</h1>
-    <%= link_to "← ホームに戻る", performance_index_path, 
-        class: "bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
-  </div>
-  
-  <!-- パフォーマンス情報 -->
-  <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-4">📊 全手法パフォーマンス比較結果</h2>
-    <% if @duration.is_a?(Hash) %>
-      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="bg-blue-100 p-4 rounded-lg">
-          <h3 class="text-lg font-semibold text-blue-800 mb-2">Pagy 標準版</h3>
-          <div class="text-2xl font-bold text-blue-600">
-            <%= sprintf("%.2f", @duration[:pagy_standard][0] * 1000) %> ms
-          </div>
-          <p class="text-sm text-blue-600">100回実行平均</p>
-        </div>
-        
-        <div class="bg-purple-100 p-4 rounded-lg">
-          <h3 class="text-lg font-semibold text-purple-800 mb-2">Pagy Countless</h3>
-          <div class="text-2xl font-bold text-purple-600">
-            <%= sprintf("%.2f", @duration[:pagy_countless][0] * 1000) %> ms
-          </div>
-          <p class="text-sm text-purple-600">100回実行平均</p>
-        </div>
-        
-        <div class="bg-green-100 p-4 rounded-lg">
-          <h3 class="text-lg font-semibold text-green-800 mb-2">Kaminari 標準版</h3>
-          <div class="text-2xl font-bold text-green-600">
-            <%= sprintf("%.2f", @duration[:kaminari_standard][0] * 1000) %> ms
-          </div>
-          <p class="text-sm text-green-600">100回実行平均</p>
-        </div>
-        
-        <div class="bg-red-100 p-4 rounded-lg">
-          <h3 class="text-lg font-semibold text-red-800 mb-2">Kaminari without_count</h3>
-          <div class="text-2xl font-bold text-red-600">
-            <%= sprintf("%.2f", @duration[:kaminari_without_count][0] * 1000) %> ms
-          </div>
-          <p class="text-sm text-red-600">100回実行平均</p>
-        </div>
-      </div>
-      
-      <!-- SQLクエリ比較 -->
-      <div class="mt-8">
-        <h3 class="text-xl font-semibold text-gray-700 mb-4">🗃️ 各手法のSQLクエリ比較</h3>
-        <div class="grid md:grid-cols-2 gap-6 mb-6">
-          <div class="bg-white p-4 rounded border">
-            <h4 class="font-semibold text-blue-700 mb-2">Pagy 標準版</h4>
-            <div class="text-xs space-y-1">
-              <div class="text-blue-800 font-semibold">実行順序:</div>
-              <div>1. <code class="bg-blue-50 p-1 rounded text-xs">SELECT COUNT(*) FROM "articles"</code></div>
-              <div>2. <code class="bg-blue-50 p-1 rounded text-xs">SELECT * ... LIMIT 25 OFFSET ?</code></div>
-              <div class="text-blue-600 mt-2">⚠️ COUNT即座実行 → データ遅延実行</div>
-            </div>
-          </div>
-          
-          <div class="bg-white p-4 rounded border">
-            <h4 class="font-semibold text-purple-700 mb-2">Pagy Countless</h4>
-            <div class="text-xs space-y-1">
-              <div class="text-purple-800 font-semibold">実行順序:</div>
-              <div>1. <code class="bg-purple-50 p-1 rounded text-xs">SELECT * ... LIMIT 26 OFFSET ?</code></div>
-              <div class="text-purple-600 mt-2">✅ 1クエリのみ（+1件で次ページ判定）</div>
-            </div>
-          </div>
-          
-          <div class="bg-white p-4 rounded border">
-            <h4 class="font-semibold text-green-700 mb-2">Kaminari 標準版</h4>
-            <div class="text-xs space-y-1">
-              <div class="text-green-800 font-semibold">実行順序:</div>
-              <div>1. <code class="bg-green-50 p-1 rounded text-xs">SELECT * ... LIMIT 25 OFFSET ?</code></div>
-              <div>2. <code class="bg-green-50 p-1 rounded text-xs">COUNT(*) FROM (SELECT 1 ... LIMIT 25000)</code></div>
-              <div class="text-green-600 mt-2">⚠️ データ遅延実行 → COUNT必要時実行</div>
-            </div>
-          </div>
-          
-          <div class="bg-white p-4 rounded border">
-            <h4 class="font-semibold text-red-700 mb-2">Kaminari without_count</h4>
-            <div class="text-xs space-y-1">
-              <div class="text-red-800 font-semibold">実行順序:</div>
-              <div>1. <code class="bg-red-50 p-1 rounded text-xs">SELECT * ... LIMIT 25 OFFSET ?</code></div>
-              <div class="text-red-600 mt-2">✅ 1クエリのみ（総件数情報なし）</div>
-            </div>
-          </div>
-        </div>
-      </div>
+<h1>包括的ベンチマーク結果</h1>
 
-      <!-- パフォーマンス分析 -->
-      <div class="mt-8">
-        <h3 class="text-xl font-semibold text-gray-700 mb-4">📈 パフォーマンス分析</h3>
-        <div class="bg-white p-4 rounded border">
-          <% times = @duration.values.map(&:first) %>
-          <% fastest_time = times.min %>
-          <% fastest_method = @duration.find { |k, v| v.first == fastest_time }.first %>
-          
-          <div class="mb-4">
-            <strong class="text-green-600">🏆 最高速度: </strong>
-            <span class="font-semibold"><%= fastest_method.to_s.humanize %></span>
-            (<%= sprintf("%.2f", fastest_time * 1000) %> ms)
-          </div>
-          
-          <div class="space-y-2">
-            <% @duration.each do |method, time_array| %>
-              <% time = time_array.first %>
-              <% percentage_diff = ((time - fastest_time) / fastest_time * 100).round(1) %>
-              <div class="flex justify-between">
-                <span><%= method.to_s.humanize %>:</span>
-                <span class="<%= percentage_diff == 0.0 ? 'text-green-600' : 'text-gray-600' %>">
-                  <%= sprintf("%.2f", time * 1000) %> ms
-                  <% unless percentage_diff == 0.0 %>
-                    (+<%= percentage_diff %>%)
-                  <% end %>
-                </span>
-              </div>
-            <% end %>
-          </div>
-        </div>
-      </div>
+<h2>全手法パフォーマンス比較結果</h2>
+<% if @duration.is_a?(Hash) %>
+  <h3>Pagy 標準版</h3>
+  <p><%= sprintf("%.2f", @duration[:pagy_standard][0] * 1000) %> ms (100回実行平均)</p>
+
+  <h3>Pagy Countless</h3>
+  <p><%= sprintf("%.2f", @duration[:pagy_countless][0] * 1000) %> ms (100回実行平均)</p>
+
+  <h3>Kaminari 標準版</h3>
+  <p><%= sprintf("%.2f", @duration[:kaminari_standard][0] * 1000) %> ms (100回実行平均)</p>
+
+  <h3>Kaminari without_count</h3>
+  <p><%= sprintf("%.2f", @duration[:kaminari_without_count][0] * 1000) %> ms (100回実行平均)</p>
+
+  <h3>各手法のSQLクエリ比較</h3>
+  <% if @sql_queries %>
+    <h4>COUNTクエリあり手法</h4>
+    <% if @sql_queries[:pagy_standard] %>
+      <p>Pagy 標準:</p>
+      <% @sql_queries[:pagy_standard].each do |query| %>
+        <pre><%= query %></pre>
+      <% end %>
     <% end %>
-  </div>
+    <% if @sql_queries[:kaminari_standard] %>
+      <p>Kaminari 標準:</p>
+      <% @sql_queries[:kaminari_standard].each do |query| %>
+        <pre><%= query %></pre>
+      <% end %>
+    <% end %>
 
-  <!-- 実際のデータ表示 -->
-  <div class="bg-white shadow-lg rounded-lg p-6">
-    <h2 class="text-xl font-semibold mb-4 text-gray-700">📋 データサンプル</h2>
-    
-    <div class="grid md:grid-cols-2 gap-8">
-      <!-- Pagy結果 -->
-      <div>
-        <h3 class="text-lg font-semibold text-blue-700 mb-3">Pagy標準版の結果 (<%= @pagy_standard_articles.count %>件)</h3>
-        <% if @pagy_standard %>
-          <div class="mb-3 text-sm text-gray-600">
-            ページ <%= @pagy_standard.page %> / <%= @pagy_standard.pages %> 
-            (全<%= @pagy_standard.count %>件)
-          </div>
-        <% end %>
-        <div class="space-y-2 max-h-64 overflow-y-auto">
-          <% @pagy_standard_articles.first(5).each do |article| %>
-            <div class="border rounded p-2 text-sm">
-              <strong>ID: <%= article.id %></strong> - <%= article.title.truncate(40) %>
-            </div>
-          <% end %>
-        </div>
-      </div>
-      
-      <!-- Kaminari結果 -->
-      <div>
-        <h3 class="text-lg font-semibold text-green-700 mb-3">Kaminari標準版の結果 (<%= @kaminari_standard_articles.count %>件)</h3>
-        <div class="mb-3 text-sm text-gray-600">
-          ページ <%= @kaminari_standard_articles.current_page %> / <%= @kaminari_standard_articles.total_pages %> 
-          (全<%= @kaminari_standard_articles.total_count %>件)
-        </div>
-        <div class="space-y-2 max-h-64 overflow-y-auto">
-          <% @kaminari_standard_articles.first(5).each do |article| %>
-            <div class="border rounded p-2 text-sm">
-              <strong>ID: <%= article.id %></strong> - <%= article.title.truncate(40) %>
-            </div>
-          <% end %>
-        </div>
-      </div>
-    </div>
-    
-    <div class="mt-6 text-center">
-      <%= link_to "別のページでテスト", performance_comprehensive_benchmark_path(page: (params[:page].to_i + 1)), 
-          class: "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 mr-4" %>
-      <%= link_to "ページ1に戻る", performance_comprehensive_benchmark_path(page: 1), 
-          class: "bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
-    </div>
-  </div>
-</div>
+    <h4>COUNTクエリなし手法</h4>
+    <% if @sql_queries[:pagy_countless] %>
+      <p>Pagy Countless:</p>
+      <% @sql_queries[:pagy_countless].each do |query| %>
+        <pre><%= query %></pre>
+      <% end %>
+    <% end %>
+    <% if @sql_queries[:kaminari_without_count] %>
+      <p>Kaminari without_count:</p>
+      <% @sql_queries[:kaminari_without_count].each do |query| %>
+        <pre><%= query %></pre>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% if @benchmark_results %>
+    <h3>詳細ベンチマーク結果:</h3>
+    <pre>
+<%= @benchmark_results %>
+</pre>
+  <% end %>
+<% else %>
+  <p>ベンチマーク結果がありません</p>
+<% end %>

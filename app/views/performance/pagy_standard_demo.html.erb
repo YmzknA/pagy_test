@@ -1,65 +1,14 @@
-<% content_for(:footer_links) do %>
-  <%= link_to "Pagy Countlessと比較", performance_pagy_countless_demo_path, 
-      class: "bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
+<h1>Pagy 標準版テスト</h1>
+
+<h2>テスト内容: COUNTクエリ付きのPagy標準実装</h2>
+
+<% if @duration %>
+  <p>データのみ: <%= sprintf('%.4f', @duration[:data_only][0] * 1000) %> ms</p>
+  <p>ビュー含む: <%= sprintf('%.4f', @duration[:with_view][0] * 1000) %> ms</p>
 <% end %>
 
-<%= render 'large_data_test_links', 
-    path_helper: ->(page:) { performance_pagy_standard_demo_path(page: page) } %>
-
-<% page = params[:page]&.to_i || 1 %>
-<% per_page = params[:per_page]&.to_i || 25 %>
-<% offset = (page - 1) * per_page %>
-
-<% queries = [
-  {
-    name: "1. COUNT Query (pagy呼び出し時 - 即座実行)",
-    sql: 'SELECT COUNT(*) FROM "articles"',
-    note: "⏰ pagy() 呼び出し時に即座実行される - 総件数: 63,655件"
-  },
-  {
-    name: "2. SELECT Query (articles.to_a呼び出し時)", 
-    sql: "SELECT \"articles\".* FROM \"articles\" ORDER BY \"articles\".\"id\" ASC LIMIT #{per_page} OFFSET #{offset}",
-    note: "⏰ articles.to_a 実行時に発行 - 実際のページデータを取得"
-  }
-] %>
-
-<%= render 'single_benchmark_layout', 
-    color: 'blue', 
-    title: 'Pagy 標準版デモ', 
-    method_name: 'Pagy 標準',
-    queries: queries do %>
-  
-  <h2 class="text-xl font-semibold mb-4 text-gray-700">記事一覧 (Pagy標準版)</h2>
-  
-  <% if @pagy %>
-    <div class="mb-4 text-sm text-gray-600">
-      デバッグ: ページ <%= @pagy.page %>, 表示件数: <%= @pagy.limit %>, 
-      前: <%= @pagy.prev %>, 次: <%= @pagy.next %>
-    </div>
-    
-    <div class="mb-4" id="pagy-nav-top">
-      <%== pagy_nav(@pagy, link_extra: 'class="px-3 py-2 mx-1 rounded bg-blue-100 hover:bg-blue-200 text-blue-800"') %>
-    </div>
-  <% end %>
-  
-  <div class="space-y-4">
-    <% @articles.each do |article| %>
-      <div class="border border-gray-200 rounded p-4">
-        <div class="flex justify-between items-start mb-2">
-          <h4 class="font-semibold text-lg text-gray-800"><%= article.title %></h4>
-          <span class="text-sm text-gray-500 ml-4">ID: <%= article.id %></span>
-        </div>
-        <p class="text-gray-600 mt-2"><%= truncate(article.content, length: 200) %></p>
-        <div class="text-sm text-gray-500 mt-2">
-          作成日: <%= article.created_at.strftime("%Y年%m月%d日") %>
-        </div>
-      </div>
-    <% end %>
-  </div>
-  
-  <% if @pagy %>
-    <div class="mt-6" id="pagy-nav-bottom">
-      <%== pagy_nav(@pagy, link_extra: 'class="px-3 py-2 mx-1 rounded bg-blue-100 hover:bg-blue-200 text-blue-800"') %>
-    </div>
-  <% end %>
+<% if @pagy && @articles %>
+  <p>ID一覧: <%= @articles.map(&:id).join(', ') %></p>
+  <%== pagy_nav(@pagy) %>
 <% end %>
+
