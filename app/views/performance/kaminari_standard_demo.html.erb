@@ -6,16 +6,25 @@
 <%= render 'large_data_test_links', 
     path_helper: ->(page:) { performance_kaminari_standard_demo_path(page: page) } %>
 
+<% page = params[:page]&.to_i || 1 %>
+<% per_page = params[:per_page]&.to_i || 25 %>
+<% offset = (page - 1) * per_page %>
+
 <% queries = [
   {
-    name: "1. SELECT Query (遅延実行)",
-    sql: 'SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2',
-    note: "記事データを取得 - .to_a を呼んだ時に実行 (LIMIT: #{params[:per_page] || 25}, OFFSET: #{((params[:page] || 1).to_i - 1) * (params[:per_page] || 25).to_i})"
+    name: "1. Preview Query (page()呼び出し時)",
+    sql: "SELECT \"articles\".* FROM \"articles\" /* loading for pp */ ORDER BY \"articles\".\"id\" ASC LIMIT 11 OFFSET #{offset}",
+    note: "⏰ Article.page(#{page}).per(#{per_page}) 呼び出し時 - プレビュー用？"
   },
   {
-    name: "2. COUNT Query with Subquery (total_count呼び出し時)",
-    sql: 'SELECT COUNT(*) FROM (SELECT 1 AS one FROM "articles" LIMIT $1) subquery_for_count',
-    note: "total_count メソッド呼び出し時に実行される最適化COUNTクエリ"
+    name: "2. Main SELECT Query (articles.to_a呼び出し時)", 
+    sql: "SELECT \"articles\".* FROM \"articles\" ORDER BY \"articles\".\"id\" ASC LIMIT #{per_page} OFFSET #{offset}",
+    note: "⏰ articles.to_a 実行時 - 実際のページデータを取得"
+  },
+  {
+    name: "3. COUNT Query with Subquery (total_count呼び出し時)",
+    sql: 'SELECT COUNT(*) FROM (SELECT 1 AS one FROM "articles" LIMIT 25000) subquery_for_count',
+    note: "⏰ total_count メソッド呼び出し時 - 最適化されたCOUNTクエリ (25,000件)"
   }
 ] %>
 

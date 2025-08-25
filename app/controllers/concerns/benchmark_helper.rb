@@ -6,9 +6,9 @@ module BenchmarkHelper
   # 分岐の位置による影響を排除するため、各ベンチマークでそれぞれメソッドを分ける
 
   # Pagy標準版専用ベンチマーク
-  # 発行クエリ: 
-  # 1. SELECT COUNT(*) FROM "articles"
-  # 2. SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2
+  # 実際の発行クエリ (Docker実測): 
+  # 1. pagy() 呼び出し時 (即座実行): SELECT COUNT(*) FROM "articles"
+  # 2. articles.to_a 呼び出し時: SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT 25 OFFSET 0
   def run_pagy_standard_benchmark(page_param: 1, per_page: 25, iterations: 100)
     @benchmark_results = Benchmark.bm(35) do |x|
       @data_time = x.report("Pagy standard (data only)") do
@@ -39,9 +39,9 @@ module BenchmarkHelper
   end
 
   # Pagy Countless版専用ベンチマーク
-  # 発行クエリ: 
-  # 1. SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2
-  # (COUNTクエリなし - 高速化のポイント)
+  # 実際の発行クエリ (Docker実測): 
+  # 1. pagy_countless() 呼び出し時 (即座実行): SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT 26 OFFSET 0
+  # (COUNTクエリなし + LIMIT+1で次ページ判定 - 高速化のポイント)
   def run_pagy_countless_benchmark(page_param: 1, per_page: 25, iterations: 100)
     @benchmark_results = Benchmark.bm(35) do |x|
       @data_time = x.report("Pagy countless (data only)") do
@@ -72,9 +72,10 @@ module BenchmarkHelper
   end
 
   # Kaminari標準版専用ベンチマーク
-  # 発行クエリ: 
-  # 1. SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2
-  # 2. SELECT COUNT(*) FROM (SELECT 1 AS one FROM "articles" LIMIT $1) subquery_for_count
+  # 実際の発行クエリ (Docker実測): 
+  # 1. Article.page().per() 呼び出し時: SELECT "articles".* FROM "articles" /* loading for pp */ ORDER BY "articles"."id" ASC LIMIT 11 OFFSET 0
+  # 2. articles.to_a 呼び出し時: SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT 25 OFFSET 0
+  # 3. total_count 呼び出し時: SELECT COUNT(*) FROM (SELECT 1 AS one FROM "articles" LIMIT 25000) subquery_for_count
   def run_kaminari_standard_benchmark(page_param: 1, per_page: 25, iterations: 100)
     @benchmark_results = Benchmark.bm(35) do |x|
       @data_time = x.report("Kaminari standard (data only)") do
@@ -105,8 +106,9 @@ module BenchmarkHelper
   end
 
   # Kaminari without_count版専用ベンチマーク
-  # 発行クエリ: 
-  # 1. SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2
+  # 実際の発行クエリ (Docker実測): 
+  # 1. Article.page().per().without_count 呼び出し時: SELECT "articles".* FROM "articles" /* loading for pp */ ORDER BY "articles"."id" ASC LIMIT 12 OFFSET 0
+  # 2. articles.to_a 呼び出し時: SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT 26 OFFSET 0
   # (COUNTクエリなし - 高速化のポイント)
   def run_kaminari_without_count_benchmark(page_param: 1, per_page: 25, iterations: 100)
     @benchmark_results = Benchmark.bm(35) do |x|

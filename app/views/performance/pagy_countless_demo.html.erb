@@ -6,11 +6,16 @@
 <%= render 'large_data_test_links', 
     path_helper: ->(page:) { performance_pagy_countless_demo_path(page: page) } %>
 
+<% page = params[:page]&.to_i || 1 %>
+<% per_page = params[:per_page]&.to_i || 25 %>
+<% offset = (page - 1) * per_page %>
+<% limit_plus_one = per_page + 1 %>
+
 <% queries = [
   {
-    name: "SELECT Query (LIMIT +1 for next page detection)",
-    sql: 'SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2',
-    note: "指定ページの記事データを取得 + 次ページの有無確認のため1件多く取得 (LIMIT: #{(params[:per_page] || 25).to_i + 1}, OFFSET: #{((params[:page] || 1).to_i - 1) * (params[:per_page] || 25).to_i})"
+    name: "SELECT Query (pagy_countless呼び出し時 - 即座実行)",
+    sql: "SELECT \"articles\".* FROM \"articles\" ORDER BY \"articles\".\"id\" ASC LIMIT #{limit_plus_one} OFFSET #{offset}",
+    note: "⏰ pagy_countless() 呼び出し時に即座実行 - #{per_page}+1件取得して次ページ判定 (COUNTクエリなし)"
   }
 ] %>
 

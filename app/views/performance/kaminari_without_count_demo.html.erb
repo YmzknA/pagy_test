@@ -6,11 +6,20 @@
 <%= render 'large_data_test_links', 
     path_helper: ->(page:) { performance_kaminari_without_count_demo_path(page: page) } %>
 
+<% page = params[:page]&.to_i || 1 %>
+<% per_page = params[:per_page]&.to_i || 25 %>
+<% offset = (page - 1) * per_page %>
+
 <% queries = [
   {
-    name: "SELECT Query",
-    sql: 'SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2',
-    note: "指定ページの記事データのみ取得 (LIMIT: #{params[:per_page] || 25}, OFFSET: #{((params[:page] || 1).to_i - 1) * (params[:per_page] || 25).to_i})"
+    name: "1. Preview Query (without_count呼び出し時)",
+    sql: "SELECT \"articles\".* FROM \"articles\" /* loading for pp */ ORDER BY \"articles\".\"id\" ASC LIMIT 12 OFFSET #{offset}",
+    note: "⏰ Article.page(#{page}).per(#{per_page}).without_count 呼び出し時 - プレビュー用"
+  },
+  {
+    name: "2. Main SELECT Query (articles.to_a呼び出し時)", 
+    sql: "SELECT \"articles\".* FROM \"articles\" ORDER BY \"articles\".\"id\" ASC LIMIT 26 OFFSET #{offset}",
+    note: "⏰ articles.to_a 実行時 - 実データ取得（COUNTクエリなし）"
   }
 ] %>
 
