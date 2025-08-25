@@ -10,7 +10,7 @@ class PerformanceController < ApplicationController
     @results = run_benchmark
   end
 
-  # 統合ベンチマーク（5項目すべて）
+  # 統合ベンチマーク（4項目すべて）
   def comprehensive_benchmark
     page_param = params[:page] || 1
     run_comprehensive_benchmark(page_param: page_param)
@@ -40,12 +40,6 @@ class PerformanceController < ApplicationController
     run_kaminari_without_count_benchmark(page_param: page_param)
   end
 
-  # Keyset Pagination版
-  def keyset_pagination_demo
-    cursor = params[:cursor]
-    direction = params[:direction] || 'next'
-    run_keyset_pagination_benchmark(cursor: cursor, direction: direction)
-  end
 
   private
   
@@ -98,21 +92,7 @@ class PerformanceController < ApplicationController
           end
         end
         
-        # Keyset Pagination (最初のページ以外は前ページの最後のIDを使用)
-        keyset_time = x.report("Keyset pagination #{page}") do
-          cursor = page > 1 ? ((page - 1) * per_page) : nil
-          n.times do
-            clear_query_cache
-            if cursor
-              articles = Article.where('id > ?', cursor).order(:id).limit(per_page)
-            else
-              articles = Article.order(:id).limit(per_page)
-            end
-            articles.to_a
-          end
-        end
-        
-        [pagy_time, pagy_countless_time, kaminari_time, kaminari_no_count_time, keyset_time]
+        [pagy_time, pagy_countless_time, kaminari_time, kaminari_no_count_time]
       end
     end
     
@@ -131,8 +111,7 @@ class PerformanceController < ApplicationController
           'Pagy Standard (with COUNT)',
           'Pagy Countless (without COUNT)',
           'Kaminari Standard (with COUNT)', 
-          'Kaminari without_count (without COUNT)',
-          'Keyset Pagination (cursor-based)'
+          'Kaminari without_count (without COUNT)'
         ]
       }
     }
@@ -146,7 +125,7 @@ class PerformanceController < ApplicationController
     }
     
     total_times = Hash.new(0)
-    method_names = [:pagy_standard, :pagy_countless, :kaminari_standard, :kaminari_no_count, :keyset_pagination]
+    method_names = [:pagy_standard, :pagy_countless, :kaminari_standard, :kaminari_no_count]
     
     results.each do |page, benchmark_results|
       page_times = {}
@@ -170,12 +149,10 @@ class PerformanceController < ApplicationController
     summary[:total_times] = total_times
     
     summary[:performance_notes] = [
-      "Keyset pagination typically fastest for large offsets (avoids OFFSET performance issues)",
       "Pagy/Kaminari countless versions avoid expensive COUNT queries", 
       "Pagy generally has less overhead than Kaminari for standard pagination",
       "Performance difference increases significantly with higher page numbers",
-      "Database indexing on ordering columns is critical for all methods",
-      "Keyset pagination trades navigation flexibility for consistent performance"
+      "Database indexing on ordering columns is critical for all methods"
     ]
     
     summary

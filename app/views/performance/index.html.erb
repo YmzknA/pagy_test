@@ -8,7 +8,7 @@
       テスト用に <%= Article.count %> 件の記事を作成しています。
     </p>
     
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
       <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
         <h3 class="text-xl font-semibold text-blue-800 mb-3">Pagy 標準版</h3>
         <p class="text-blue-600 mb-4">COUNTクエリ付きの標準的なPagy実装</p>
@@ -37,17 +37,11 @@
             class: "bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
       </div>
 
-      <div class="bg-orange-50 p-6 rounded-lg border border-orange-200">
-        <h3 class="text-xl font-semibold text-orange-800 mb-3">Keyset Pagination</h3>
-        <p class="text-orange-600 mb-4">大量データ用カーソルベースページネーション</p>
-        <%= link_to "Keyset Paginationを試す", performance_keyset_pagination_demo_path, 
-            class: "bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
-      </div>
       
       <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
         <h3 class="text-xl font-semibold text-gray-800 mb-3">包括的ベンチマーク</h3>
-        <p class="text-gray-600 mb-4">全手法の詳細パフォーマンス比較</p>
-        <%= link_to "ベンチマーク実行", performance_benchmark_path, 
+        <p class="text-gray-600 mb-4">4つの手法を一度に比較測定</p>
+        <%= link_to "統合ベンチマーク実行", performance_comprehensive_benchmark_path, 
             class: "bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
       </div>
     </div>
@@ -55,32 +49,23 @@
   
   <div class="bg-gray-50 p-6 rounded-lg">
     <h3 class="text-lg font-semibold mb-3 text-gray-700">🔬 包括的なテスト機能:</h3>
-    <div class="grid md:grid-cols-3 gap-6">
+    <div class="grid md:grid-cols-2 gap-6">
       <div>
-        <h4 class="font-semibold text-gray-600 mb-2">Pagy 最適化</h4>
+        <h4 class="font-semibold text-gray-600 mb-2">Pagy vs Kaminari 比較機能</h4>
         <ul class="list-disc pl-6 space-y-1 text-gray-600">
           <li>🚀 Countlessページネーション (COUNTクエリなし)</li>
-          <li>⚡ JavaScript駆動ナビゲーションヘルパー</li>
+          <li>⚡ 標準ページネーション (COUNTクエリ付き)</li>
           <li>💾 異なるページのメモリ使用量解析</li>
           <li>📊 1秒あたりの反復数 (IPS) ベンチマーク</li>
         </ul>
       </div>
       <div>
-        <h4 class="font-semibold text-gray-600 mb-2">Keyset ページネーション</h4>
-        <ul class="list-disc pl-6 space-y-1 text-gray-600">
-          <li>🎯 カーソルベースナビゲーション</li>
-          <li>⚡ 大量データセットでの一定パフォーマンス</li>
-          <li>🔄 スケーラビリティ向上のOFFSETクエリなし</li>
-          <li>📈 リアルタイムデータフィードに最適</li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="font-semibold text-gray-600 mb-2">高度な機能</h4>
+        <h4 class="font-semibold text-gray-600 mb-2">詳細なテスト機能</h4>
         <ul class="list-disc pl-6 space-y-1 text-gray-600">
           <li>マルチページテスト (ページ 1, 50, 100, 200)</li>
-          <li>標準偏差を使った統計解析</li>
+          <li>両ライブラリの最適化版の性能比較</li>
           <li><%= number_with_delimiter(Article.count) %> 件のレコードでの現実的なシナリオ</li>
-          <li>最適パフォーマンスのためのデータベースインデックシング</li>
+          <li>データ取得とビュー描画の個別測定</li>
         </ul>
       </div>
     </div>

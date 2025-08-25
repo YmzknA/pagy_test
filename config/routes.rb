@@ -8,14 +8,13 @@ Rails.application.routes.draw do
   get "performance/pagy_countless_demo" 
   get "performance/kaminari_standard_demo"
   get "performance/kaminari_without_count_demo"
-  get "performance/keyset_pagination_demo"
   
   # 既存のルート（互換性維持）
   get "performance/pagy_demo", to: "performance#pagy_standard_demo"
   get "performance/kaminari_demo", to: "performance#kaminari_standard_demo"
-  get "performance/keyset_demo", to: "performance#keyset_pagination_demo"
   
   get "performance/benchmark"
+  get "performance/comprehensive_benchmark"
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
