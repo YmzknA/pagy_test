@@ -1,6 +1,7 @@
 require 'benchmark'
 
 class PerformanceController < ApplicationController
+  include BenchmarkHelper
   def index
   end
 
@@ -9,155 +10,109 @@ class PerformanceController < ApplicationController
     @results = run_benchmark
   end
 
-  def pagy_demo
+  # 統合ベンチマーク（5項目すべて）
+  def comprehensive_benchmark
     page_param = params[:page] || 1
-    n = 50  # ビュー処理が重いので反復数を減らす
-    
-    @benchmark_results = Benchmark.bm(35) do |x|
-      # データ取得のみのベンチマーク
-      @pagy_standard_data_time = x.report("Pagy standard (data only)") do
-        n.times do
-          clear_query_cache
-          pagy_obj, articles = pagy(Article.order(:id), items: 25, page: page_param)
-          articles.to_a
-        end
-      end
-      
-      @pagy_countless_data_time = x.report("Pagy countless (data only)") do
-        n.times do
-          clear_query_cache
-          pagy_obj, articles = pagy_countless(Article.order(:id), items: 25, page: page_param)
-          articles.to_a
-        end
-      end
-      
-      # ビュー処理も含むベンチマーク
-      @pagy_standard_view_time = x.report("Pagy standard (data + view)") do
-        n.times do
-          clear_query_cache
-          pagy_obj, articles = pagy(Article.order(:id), items: 25, page: page_param)
-          articles.to_a
-          render_to_string('performance/_unified_pagy_content', locals: { pagy_obj: pagy_obj, articles: articles })
-        end
-      end
-      
-      @pagy_countless_view_time = x.report("Pagy countless (data + view)") do
-        n.times do
-          clear_query_cache
-          pagy_obj, articles = pagy_countless(Article.order(:id), items: 25, page: page_param)
-          articles.to_a
-          render_to_string('performance/_unified_pagy_content', locals: { pagy_obj: pagy_obj, articles: articles })
-        end
-      end
-    end
-    
-    # 表示用のデータを最後に取得（キャッシュクリア後）
-    clear_query_cache
-    @pagy, @articles = pagy_countless(Article.order(:id), items: 25, page: page_param)
-    @duration = {
-      data_only: [@pagy_standard_data_time.real, @pagy_countless_data_time.real],
-      with_view: [@pagy_standard_view_time.real, @pagy_countless_view_time.real]
-    }
+    run_comprehensive_benchmark(page_param: page_param)
   end
 
-  def kaminari_demo
+  # Pagy 標準版
+  def pagy_standard_demo
     page_param = params[:page] || 1
-    n = 50  # ビュー処理が重いので反復数を減らす
-    
-    @benchmark_results = Benchmark.bm(35) do |x|
-      # データ取得のみのベンチマーク
-      @kaminari_standard_data_time = x.report("Kaminari standard (data only)") do
-        n.times do
-          clear_query_cache
-          articles = Article.order(:id).page(page_param).per(25)
-          articles.to_a
-        end
-      end
-      
-      @kaminari_no_count_data_time = x.report("Kaminari no_count (data only)") do
-        n.times do
-          clear_query_cache
-          articles = Article.order(:id).page(page_param).per(25).without_count
-          articles.to_a
-        end
-      end
-      
-      # ビュー処理も含むベンチマーク
-      @kaminari_standard_view_time = x.report("Kaminari standard (data + view)") do
-        n.times do
-          clear_query_cache
-          articles = Article.order(:id).page(page_param).per(25)
-          articles.to_a
-          render_to_string('performance/_unified_kaminari_content', locals: { articles: articles })
-        end
-      end
-      
-      @kaminari_no_count_view_time = x.report("Kaminari no_count (data + view)") do
-        n.times do
-          clear_query_cache
-          articles = Article.order(:id).page(page_param).per(25).without_count
-          articles.to_a
-          render_to_string('performance/_unified_kaminari_content', locals: { articles: articles })
-        end
-      end
-    end
-    
-    # 表示用のデータを最後に取得（キャッシュクリア後）
-    clear_query_cache
-    @articles = Article.order(:id).page(page_param).per(25).without_count
-    @duration = {
-      data_only: [@kaminari_standard_data_time.real, @kaminari_no_count_data_time.real],
-      with_view: [@kaminari_standard_view_time.real, @kaminari_no_count_view_time.real]
-    }
+    run_pagy_standard_benchmark(page_param: page_param)
+  end
+
+  # Pagy Countless版
+  def pagy_countless_demo
+    page_param = params[:page] || 1
+    run_pagy_countless_benchmark(page_param: page_param)
+  end
+
+  # Kaminari 標準版
+  def kaminari_standard_demo
+    page_param = params[:page] || 1
+    run_kaminari_standard_benchmark(page_param: page_param)
+  end
+
+  # Kaminari without_count版
+  def kaminari_without_count_demo
+    page_param = params[:page] || 1
+    run_kaminari_without_count_benchmark(page_param: page_param)
+  end
+
+  # Keyset Pagination版
+  def keyset_pagination_demo
+    cursor = params[:cursor]
+    direction = params[:direction] || 'next'
+    run_keyset_pagination_benchmark(cursor: cursor, direction: direction)
   end
 
   private
   
   def run_benchmark
-    puts "Starting pagination performance benchmark..."
+    puts "Starting comprehensive pagination performance benchmark..."
     
     test_pages = [1, 50, 100, 2000]
     n = 500
+    per_page = 25
     
     results = {}
     
     test_pages.each do |page|
       puts "\nTesting page #{page}:"
       
-      results[page] = Benchmark.bm(20) do |x|
-        pagy_time = x.report("Pagy page #{page}") do
+      results[page] = Benchmark.bm(25) do |x|
+        # Pagy標準版
+        pagy_time = x.report("Pagy standard #{page}") do
           n.times do
             clear_query_cache
-            pagy_obj, articles = pagy(Article.order(:id), items: 25, page: page)
+            pagy_obj, articles = pagy(Article.order(:id), items: per_page, page: page)
             articles.to_a
           end
         end
         
-        kaminari_time = x.report("Kaminari page #{page}") do
-          n.times do
-            clear_query_cache
-            articles = Article.order(:id).page(page).per(25)
-            articles.to_a
-          end
-        end
-        
+        # Pagy Countless版
         pagy_countless_time = x.report("Pagy countless #{page}") do
           n.times do
             clear_query_cache
-            pagy_obj, articles = pagy_countless(Article.order(:id), items: 25, page: page)
+            pagy_obj, articles = pagy_countless(Article.order(:id), items: per_page, page: page)
             articles.to_a
           end
         end
         
+        # Kaminari標準版
+        kaminari_time = x.report("Kaminari standard #{page}") do
+          n.times do
+            clear_query_cache
+            articles = Article.order(:id).page(page).per(per_page)
+            articles.to_a
+          end
+        end
+        
+        # Kaminari without_count版
         kaminari_no_count_time = x.report("Kaminari no count #{page}") do
           n.times do
             clear_query_cache
-            articles = Article.order(:id).page(page).per(25).without_count
+            articles = Article.order(:id).page(page).per(per_page).without_count
             articles.to_a
           end
         end
         
-        [pagy_time, kaminari_time, pagy_countless_time, kaminari_no_count_time]
+        # Keyset Pagination (最初のページ以外は前ページの最後のIDを使用)
+        keyset_time = x.report("Keyset pagination #{page}") do
+          cursor = page > 1 ? ((page - 1) * per_page) : nil
+          n.times do
+            clear_query_cache
+            if cursor
+              articles = Article.where('id > ?', cursor).order(:id).limit(per_page)
+            else
+              articles = Article.order(:id).limit(per_page)
+            end
+            articles.to_a
+          end
+        end
+        
+        [pagy_time, pagy_countless_time, kaminari_time, kaminari_no_count_time, keyset_time]
       end
     end
     
@@ -170,7 +125,15 @@ class PerformanceController < ApplicationController
       test_info: {
         iterations: n,
         pages_tested: test_pages,
-        total_records: Article.count
+        per_page: per_page,
+        total_records: Article.count,
+        methods_tested: [
+          'Pagy Standard (with COUNT)',
+          'Pagy Countless (without COUNT)',
+          'Kaminari Standard (with COUNT)', 
+          'Kaminari without_count (without COUNT)',
+          'Keyset Pagination (cursor-based)'
+        ]
       }
     }
   end
@@ -183,24 +146,16 @@ class PerformanceController < ApplicationController
     }
     
     total_times = Hash.new(0)
+    method_names = [:pagy_standard, :pagy_countless, :kaminari_standard, :kaminari_no_count, :keyset_pagination]
     
     results.each do |page, benchmark_results|
       page_times = {}
       
       benchmark_results.each_with_index do |result, idx|
-        case idx
-        when 0
-          page_times[:pagy] = result.real
-          total_times[:pagy] += result.real
-        when 1
-          page_times[:kaminari] = result.real
-          total_times[:kaminari] += result.real
-        when 2
-          page_times[:pagy_countless] = result.real
-          total_times[:pagy_countless] += result.real
-        when 3
-          page_times[:kaminari_no_count] = result.real
-          total_times[:kaminari_no_count] += result.real
+        method_name = method_names[idx]
+        if method_name
+          page_times[method_name] = result.real
+          total_times[method_name] += result.real
         end
       end
       
@@ -215,17 +170,15 @@ class PerformanceController < ApplicationController
     summary[:total_times] = total_times
     
     summary[:performance_notes] = [
-      "Pagy generally performs better due to simpler implementation",
-      "Countless/no-count versions avoid expensive COUNT queries",
-      "Performance difference increases with higher page numbers",
-      "Database indexing significantly affects OFFSET performance"
+      "Keyset pagination typically fastest for large offsets (avoids OFFSET performance issues)",
+      "Pagy/Kaminari countless versions avoid expensive COUNT queries", 
+      "Pagy generally has less overhead than Kaminari for standard pagination",
+      "Performance difference increases significantly with higher page numbers",
+      "Database indexing on ordering columns is critical for all methods",
+      "Keyset pagination trades navigation flexibility for consistent performance"
     ]
     
     summary
   end
 
-  def clear_query_cache
-    ActiveRecord::Base.connection.clear_query_cache
-    Rails.cache.clear if Rails.cache.respond_to?(:clear)
-  end
 end
