@@ -49,6 +49,24 @@
       </div>
 
       
+      <!-- SQLクエリ情報 -->
+      <% if local_assigns[:queries] %>
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+          <h3 class="text-lg font-semibold text-gray-700 mb-3">🗃️ 発行されるSQLクエリ</h3>
+          <div class="space-y-2">
+            <% queries.each_with_index do |query, index| %>
+              <div class="bg-white p-3 rounded border">
+                <div class="text-sm font-semibold text-gray-600 mb-1"><%= index + 1 %>. <%= query[:name] %></div>
+                <code class="text-xs text-gray-800 bg-gray-100 p-2 rounded block whitespace-pre-wrap"><%= query[:sql] %></code>
+                <% if query[:note] %>
+                  <div class="text-xs text-blue-600 mt-1"><%= query[:note] %></div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
       <% if @benchmark_results %>
         <div class="bg-white p-4 rounded">
           <h3 class="font-semibold text-gray-700 mb-2">詳細ベンチマーク結果:</h3>

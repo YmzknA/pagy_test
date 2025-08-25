@@ -6,10 +6,24 @@
 <%= render 'large_data_test_links', 
     path_helper: ->(page:) { performance_kaminari_standard_demo_path(page: page) } %>
 
+<% queries = [
+  {
+    name: "SELECT Query",
+    sql: 'SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2',
+    note: "指定ページの記事データを取得 (LIMIT: #{params[:per_page] || 25}, OFFSET: #{((params[:page] || 1).to_i - 1) * (params[:per_page] || 25).to_i})"
+  },
+  {
+    name: "COUNT Query with Subquery",
+    sql: 'SELECT COUNT(*) FROM (SELECT 1 AS one FROM "articles" LIMIT $1) subquery_for_count',
+    note: "最適化されたCOUNTクエリ - subqueryでLIMITを適用して高速化"
+  }
+] %>
+
 <%= render 'single_benchmark_layout', 
     color: 'green', 
     title: 'Kaminari 標準版デモ', 
-    method_name: 'Kaminari 標準' do %>
+    method_name: 'Kaminari 標準',
+    queries: queries do %>
   
   <h2 class="text-xl font-semibold mb-4 text-gray-700">記事一覧 (Kaminari標準版)</h2>
   

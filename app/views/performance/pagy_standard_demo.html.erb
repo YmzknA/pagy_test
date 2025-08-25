@@ -6,10 +6,24 @@
 <%= render 'large_data_test_links', 
     path_helper: ->(page:) { performance_pagy_standard_demo_path(page: page) } %>
 
+<% queries = [
+  {
+    name: "COUNT Query",
+    sql: 'SELECT COUNT(*) FROM "articles"',
+    note: "総件数を取得してページネーション情報を計算"
+  },
+  {
+    name: "SELECT Query", 
+    sql: 'SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2',
+    note: "指定ページの記事データを取得 (LIMIT: #{params[:per_page] || 25}, OFFSET: #{((params[:page] || 1).to_i - 1) * (params[:per_page] || 25).to_i})"
+  }
+] %>
+
 <%= render 'single_benchmark_layout', 
     color: 'blue', 
     title: 'Pagy 標準版デモ', 
-    method_name: 'Pagy 標準' do %>
+    method_name: 'Pagy 標準',
+    queries: queries do %>
   
   <h2 class="text-xl font-semibold mb-4 text-gray-700">記事一覧 (Pagy標準版)</h2>
   

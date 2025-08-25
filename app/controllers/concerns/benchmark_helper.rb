@@ -6,6 +6,9 @@ module BenchmarkHelper
   # 分岐の位置による影響を排除するため、各ベンチマークでそれぞれメソッドを分ける
 
   # Pagy標準版専用ベンチマーク
+  # 発行クエリ: 
+  # 1. SELECT COUNT(*) FROM "articles"
+  # 2. SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2
   def run_pagy_standard_benchmark(page_param: 1, per_page: 25, iterations: 100)
     @benchmark_results = Benchmark.bm(35) do |x|
       @data_time = x.report("Pagy standard (data only)") do
@@ -36,6 +39,9 @@ module BenchmarkHelper
   end
 
   # Pagy Countless版専用ベンチマーク
+  # 発行クエリ: 
+  # 1. SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2
+  # (COUNTクエリなし - 高速化のポイント)
   def run_pagy_countless_benchmark(page_param: 1, per_page: 25, iterations: 100)
     @benchmark_results = Benchmark.bm(35) do |x|
       @data_time = x.report("Pagy countless (data only)") do
@@ -66,6 +72,9 @@ module BenchmarkHelper
   end
 
   # Kaminari標準版専用ベンチマーク
+  # 発行クエリ: 
+  # 1. SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2
+  # 2. SELECT COUNT(*) FROM (SELECT 1 AS one FROM "articles" LIMIT $1) subquery_for_count
   def run_kaminari_standard_benchmark(page_param: 1, per_page: 25, iterations: 100)
     @benchmark_results = Benchmark.bm(35) do |x|
       @data_time = x.report("Kaminari standard (data only)") do
@@ -96,6 +105,9 @@ module BenchmarkHelper
   end
 
   # Kaminari without_count版専用ベンチマーク
+  # 発行クエリ: 
+  # 1. SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2
+  # (COUNTクエリなし - 高速化のポイント)
   def run_kaminari_without_count_benchmark(page_param: 1, per_page: 25, iterations: 100)
     @benchmark_results = Benchmark.bm(35) do |x|
       @data_time = x.report("Kaminari without_count (data only)") do
@@ -135,7 +147,7 @@ module BenchmarkHelper
   # 4項目すべてをベンチマークする統合メソッド
   def run_comprehensive_benchmark(page_param: 1, per_page: 25, iterations: 100)
     @benchmark_results = Benchmark.bm(35) do |x|
-      # 1. Pagy標準版
+      # 1. Pagy標準版 (COUNT + SELECT)
       @pagy_standard_time = x.report("Pagy standard") do
         iterations.times do
           clear_query_cache
@@ -144,7 +156,7 @@ module BenchmarkHelper
         end
       end
 
-      # 2. Pagy Countless版
+      # 2. Pagy Countless版 (SELECT only)
       @pagy_countless_time = x.report("Pagy countless") do
         iterations.times do
           clear_query_cache
@@ -153,7 +165,7 @@ module BenchmarkHelper
         end
       end
 
-      # 3. Kaminari標準版
+      # 3. Kaminari標準版 (SELECT + COUNT with subquery)
       @kaminari_standard_time = x.report("Kaminari standard") do
         iterations.times do
           clear_query_cache
@@ -162,7 +174,7 @@ module BenchmarkHelper
         end
       end
 
-      # 4. Kaminari without_count版
+      # 4. Kaminari without_count版 (SELECT only)
       @kaminari_without_count_time = x.report("Kaminari without_count") do
         iterations.times do
           clear_query_cache

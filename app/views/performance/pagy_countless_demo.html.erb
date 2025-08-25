@@ -6,10 +6,19 @@
 <%= render 'large_data_test_links', 
     path_helper: ->(page:) { performance_pagy_countless_demo_path(page: page) } %>
 
+<% queries = [
+  {
+    name: "SELECT Query (LIMIT +1 for next page detection)",
+    sql: 'SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2',
+    note: "指定ページの記事データを取得 + 次ページの有無確認のため1件多く取得 (LIMIT: #{(params[:per_page] || 25).to_i + 1}, OFFSET: #{((params[:page] || 1).to_i - 1) * (params[:per_page] || 25).to_i})"
+  }
+] %>
+
 <%= render 'single_benchmark_layout', 
     color: 'purple', 
     title: 'Pagy Countless版デモ', 
-    method_name: 'Pagy Countless' do %>
+    method_name: 'Pagy Countless',
+    queries: queries do %>
   
   <h2 class="text-xl font-semibold mb-4 text-gray-700">記事一覧 (Pagy Countless版)</h2>
   

@@ -6,10 +6,19 @@
 <%= render 'large_data_test_links', 
     path_helper: ->(page:) { performance_kaminari_without_count_demo_path(page: page) } %>
 
+<% queries = [
+  {
+    name: "SELECT Query",
+    sql: 'SELECT "articles".* FROM "articles" ORDER BY "articles"."id" ASC LIMIT $1 OFFSET $2',
+    note: "指定ページの記事データのみ取得 (LIMIT: #{params[:per_page] || 25}, OFFSET: #{((params[:page] || 1).to_i - 1) * (params[:per_page] || 25).to_i})"
+  }
+] %>
+
 <%= render 'single_benchmark_layout', 
     color: 'red', 
     title: 'Kaminari without_count版デモ', 
-    method_name: 'Kaminari without_count' do %>
+    method_name: 'Kaminari without_count',
+    queries: queries do %>
   
   <h2 class="text-xl font-semibold mb-4 text-gray-700">記事一覧 (Kaminari without_count版)</h2>
   
