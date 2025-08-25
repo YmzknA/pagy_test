@@ -1,0 +1,47 @@
+<% content_for(:footer_links) do %>
+  <%= link_to "Pagy 標準版と比較", performance_pagy_standard_demo_path, 
+      class: "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
+<% end %>
+
+<%= render 'large_data_test_links', 
+    path_helper: ->(page:) { performance_pagy_countless_demo_path(page: page) } %>
+
+<%= render 'single_benchmark_layout', 
+    color: 'purple', 
+    title: 'Pagy Countless版デモ', 
+    method_name: 'Pagy Countless' do %>
+  
+  <h2 class="text-xl font-semibold mb-4 text-gray-700">記事一覧 (Pagy Countless版)</h2>
+  
+  <% if @pagy %>
+    <div class="mb-4 text-sm text-gray-600">
+      デバッグ: ページ <%= @pagy.page %>, 表示件数: <%= @pagy.limit %>, 
+      前: <%= @pagy.prev %>, 次: <%= @pagy.next %>
+    </div>
+    
+    <div class="mb-4" id="pagy-nav-top">
+      <%== pagy_nav(@pagy, link_extra: 'class="px-3 py-2 mx-1 rounded bg-purple-100 hover:bg-purple-200 text-purple-800"') %>
+    </div>
+  <% end %>
+  
+  <div class="space-y-4">
+    <% @articles.each do |article| %>
+      <div class="border border-gray-200 rounded p-4">
+        <div class="flex justify-between items-start mb-2">
+          <h4 class="font-semibold text-lg text-gray-800"><%= article.title %></h4>
+          <span class="text-sm text-gray-500 ml-4">ID: <%= article.id %></span>
+        </div>
+        <p class="text-gray-600 mt-2"><%= truncate(article.content, length: 200) %></p>
+        <div class="text-sm text-gray-500 mt-2">
+          作成日: <%= article.created_at.strftime("%Y年%m月%d日") %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  
+  <% if @pagy %>
+    <div class="mt-6" id="pagy-nav-bottom">
+      <%== pagy_nav(@pagy, link_extra: 'class="px-3 py-2 mx-1 rounded bg-purple-100 hover:bg-purple-200 text-purple-800"') %>
+    </div>
+  <% end %>
+<% end %>

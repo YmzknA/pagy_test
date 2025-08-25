@@ -1,0 +1,47 @@
+<div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+  <h3 class="text-lg font-semibold text-gray-800 mb-3">🚀 大量データテスト</h3>
+  <p class="text-gray-600 mb-4 text-sm">
+    大量データでの性能差をテストするため、異なる位置のページに直接ジャンプできます。
+    (1ページ25件で計算)
+  </p>
+  
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div class="text-center">
+      <%= link_to path_helper.call(page: 1), 
+          class: "block bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded text-sm transition duration-200" do %>
+        <div class="font-semibold">1ページ目</div>
+        <div class="text-xs">1-25件</div>
+      <% end %>
+    </div>
+    
+    <div class="text-center">
+      <%= link_to path_helper.call(page: 40), 
+          class: "block bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-2 rounded text-sm transition duration-200" do %>
+        <div class="font-semibold">40ページ目</div>
+        <div class="text-xs">1,000件目付近</div>
+      <% end %>
+    </div>
+    
+    <div class="text-center">
+      <%= link_to path_helper.call(page: 400), 
+          class: "block bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-2 rounded text-sm transition duration-200" do %>
+        <div class="font-semibold">400ページ目</div>
+        <div class="text-xs">10,000件目付近</div>
+      <% end %>
+    </div>
+    
+    <div class="text-center">
+      <%= link_to path_helper.call(page: 2400), 
+          class: "block bg-red-100 hover:bg-red-200 text-red-800 px-3 py-2 rounded text-sm transition duration-200" do %>
+        <div class="font-semibold">2400ページ目</div>
+        <div class="text-xs">60,000件目付近</div>
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="mt-3 text-xs text-gray-500">
+    <strong>性能の違い:</strong> 
+    1ページ目は全手法で高速。後ろのページほどOffset方式(標準版)は遅くなり、
+    Countless/Keyset方式は一定の高速性能を維持します。
+  </div>
+</div>

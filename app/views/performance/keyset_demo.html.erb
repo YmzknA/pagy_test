@@ -1,0 +1,178 @@
+<div class="max-w-6xl mx-auto p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-orange-800">Keyset ページネーションデモ</h1>
+    <%= link_to "← ホームに戻る", performance_index_path, 
+        class: "bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
+  </div>
+  
+  <div class="bg-white shadow rounded-lg p-6">
+
+    <!-- パフォーマンス情報 -->
+    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+      <h2 class="text-xl font-semibold text-orange-800 mb-2">パフォーマンスベンチマーク結果</h2>
+      <% if @duration.is_a?(Hash) %>
+        <!-- データ取得のみのパフォーマンス -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold text-orange-700 mb-3">📊 データ取得パフォーマンス (100回実行)</h3>
+          <div class="grid md:grid-cols-2 gap-4 text-sm">
+            <div class="bg-white p-3 rounded">
+              <strong class="text-orange-700">Keyset Pagination (データのみ):</strong><br>
+              <span class="text-lg font-bold text-green-600">
+                <%= sprintf("%.4f", @duration[:data_only][0] * 1000) %> ms
+              </span>
+            </div>
+            <div class="bg-white p-3 rounded">
+              <strong class="text-orange-700">Pagy Countless (データのみ):</strong><br>
+              <span class="text-lg font-bold text-blue-600">
+                <%= sprintf("%.4f", @duration[:data_only][1] * 1000) %> ms
+              </span>
+            </div>
+          </div>
+          <div class="text-xs text-gray-600 mt-2">
+            データ取得の改善: <%= sprintf('%.1f', ((@duration[:data_only][1] - @duration[:data_only][0]) / @duration[:data_only][1] * 100).abs) %>% Keysetが高速
+          </div>
+        </div>
+
+        <!-- データ + ビューのパフォーマンス -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold text-orange-700 mb-3">🎨 合計パフォーマンス (データ取得 + ビュー描画)</h3>
+          <div class="grid md:grid-cols-2 gap-4 text-sm">
+            <div class="bg-white p-3 rounded">
+              <strong class="text-orange-700">Keyset Pagination (合計):</strong><br>
+              <span class="text-lg font-bold text-green-600">
+                <%= sprintf("%.4f", @duration[:with_view][0] * 1000) %> ms
+              </span>
+            </div>
+            <div class="bg-white p-3 rounded">
+              <strong class="text-orange-700">Pagy Countless (合計):</strong><br>
+              <span class="text-lg font-bold text-blue-600">
+                <%= sprintf("%.4f", @duration[:with_view][1] * 1000) %> ms
+              </span>
+            </div>
+          </div>
+          <div class="text-xs text-gray-600 mt-2">
+            合計の改善: <%= sprintf('%.1f', ((@duration[:with_view][1] - @duration[:with_view][0]) / @duration[:with_view][1] * 100).abs) %>% Keysetが高速
+          </div>
+        </div>
+
+        <!-- ビューオーバーヘッド解析 -->
+        <div class="bg-yellow-50 p-4 rounded mb-4">
+          <h3 class="text-lg font-semibold text-yellow-700 mb-2">🔍 ビュー描画オーバーヘッド</h3>
+          <div class="grid md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <strong class="text-yellow-700">Keysetビューオーバーヘッド:</strong><br>
+              <span class="text-yellow-600">
+                <%= sprintf("%.4f", (@duration[:with_view][0] - @duration[:data_only][0]) * 1000) %> ms
+              </span>
+            </div>
+            <div>
+              <strong class="text-yellow-700">Pagy Countlessビューオーバーヘッド:</strong><br>
+              <span class="text-yellow-600">
+                <%= sprintf("%.4f", (@duration[:with_view][1] - @duration[:data_only][1]) * 1000) %> ms
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <% if @benchmark_results %>
+          <div class="bg-white p-4 rounded">
+            <h3 class="font-semibold text-gray-700 mb-2">詳細ベンチマーク結果:</h3>
+            <pre class="text-xs text-gray-600 overflow-x-auto bg-gray-50 p-2 rounded">
+<%= capture do %>
+<% @benchmark_results.each_with_index do |result, idx| %>
+<%= case idx
+when 0
+  "Keyset pagination (データのみ):     #{sprintf('%.6f', result.real)}s"
+when 1
+  "Pagy Countless (データのみ):        #{sprintf('%.6f', result.real)}s"  
+when 2
+  "Keyset pagination (データ + ビュー): #{sprintf('%.6f', result.real)}s"
+when 3
+  "Pagy Countless (データ + ビュー):    #{sprintf('%.6f', result.real)}s"
+end %>
+<% end %>
+<% end %></pre>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+
+
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">記事一覧 (Keyset Pagination)</h2>
+    
+    <div class="mb-4 flex justify-center">
+      <nav class="flex space-x-2">
+        <% if @prev_cursor %>
+          <%= link_to "← 前のページ", performance_keyset_demo_path(cursor: @prev_cursor, direction: 'prev'), 
+                      class: "px-3 py-2 bg-orange-100 hover:bg-orange-200 text-orange-800 rounded" %>
+        <% else %>
+          <span class="px-3 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+            ← 前のページ
+          </span>
+        <% end %>
+
+        <span class="px-3 py-2 bg-orange-500 text-white rounded">
+          カーソル: <%= @current_cursor || '開始' %>
+        </span>
+
+        <% if @next_cursor %>
+          <%= link_to "次のページ →", performance_keyset_demo_path(cursor: @next_cursor, direction: 'next'), 
+                      class: "px-3 py-2 bg-orange-100 hover:bg-orange-200 text-orange-800 rounded" %>
+        <% else %>
+          <span class="px-3 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+            次のページ →
+          </span>
+        <% end %>
+      </nav>
+    </div>
+    
+    <div class="space-y-4">
+      <% @articles.each do |article| %>
+        <div class="border border-gray-200 rounded p-4">
+          <div class="flex justify-between items-start mb-2">
+            <h4 class="font-semibold text-lg text-gray-800"><%= article.title %></h4>
+            <span class="text-sm text-gray-500 ml-4">ID: <%= article.id %></span>
+          </div>
+          <p class="text-gray-600 mt-2"><%= truncate(article.content, length: 200) %></p>
+          <div class="text-sm text-gray-500 mt-2">
+            作成日: <%= article.created_at.strftime("%Y年%m月%d日") %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    
+    <div class="mt-6 flex justify-center">
+      <nav class="flex space-x-2">
+        <% if @prev_cursor %>
+          <%= link_to "← 前のページ", performance_keyset_demo_path(cursor: @prev_cursor, direction: 'prev'), 
+                      class: "px-3 py-2 bg-orange-100 hover:bg-orange-200 text-orange-800 rounded" %>
+        <% else %>
+          <span class="px-3 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+            ← 前のページ
+          </span>
+        <% end %>
+
+        <span class="px-3 py-2 bg-orange-500 text-white rounded">
+          カーソル: <%= @current_cursor || '開始' %>
+        </span>
+
+        <% if @next_cursor %>
+          <%= link_to "次のページ →", performance_keyset_demo_path(cursor: @next_cursor, direction: 'next'), 
+                      class: "px-3 py-2 bg-orange-100 hover:bg-orange-200 text-orange-800 rounded" %>
+        <% else %>
+          <span class="px-3 py-2 bg-gray-200 text-gray-400 rounded cursor-not-allowed">
+            次のページ →
+          </span>
+        <% end %>
+      </nav>
+    </div>
+  </div>
+
+  
+  <div class="mt-6 text-center">
+    <%= link_to "Pagyと比較", performance_pagy_demo_path, 
+        class: "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300" %>
+  </div>
+</div>
