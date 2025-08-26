@@ -6,6 +6,7 @@
 
 # Ignore bundler config.
 /.bundle
+.bundle/
 
 # Ignore all environment files (dotenv).
 .env*
@@ -16,6 +17,9 @@
 /tmp/*
 !/log/.keep
 !/tmp/.keep
+
+# Ignore master key
+/config/master.key
 
 # Ignore pidfiles, but keep the directory.
 /tmp/pids/*
@@ -48,3 +52,6 @@ yarn-debug.log*
 
 # Ignore local secrets
 /tmp/local_secret.txt
+
+# Ignore work log directory
+work_log/

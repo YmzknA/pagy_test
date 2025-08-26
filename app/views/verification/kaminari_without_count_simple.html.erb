@@ -1,0 +1,17 @@
+<h1>Kaminari without_count - 簡単な検証</h1>
+
+<h2>実行ログ</h2>
+<% @step_log.each do |step| %>
+  <p><%= step %></p>
+<% end %>
+
+<h2>結果データ</h2>
+<p>Kaminari情報: Page <%= @articles.current_page %>, Per <%= @articles.limit_value %></p>
+<p>取得記事数: <%= @articles_array.count %></p>
+
+<h3>記事サンプル:</h3>
+<% @articles_array.first(3).each do |article| %>
+  <p>ID: <%= article.id %> - <%= article.title.truncate(50) %></p>
+<% end %>
+
+<%= link_to "← ホームに戻る", performance_index_path %>

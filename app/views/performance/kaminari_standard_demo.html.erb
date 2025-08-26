@@ -1,0 +1,14 @@
+<h1>Kaminari 標準版テスト</h1>
+
+<h2>テスト内容: COUNTクエリ付きKaminari標準実装</h2>
+
+<% if @duration %>
+  <p>データのみ: <%= sprintf('%.4f', @duration[:data_only] * 1000) %> ms</p>
+  <p>ナビゲーション含む: <%= sprintf('%.4f', @duration[:with_nav] * 1000) %> ms</p>
+<% end %>
+
+<% if @articles %>
+  <p>ID一覧: <%= @articles.map(&:id).join(', ') %></p>
+  <%= paginate @articles %>
+<% end %>
+

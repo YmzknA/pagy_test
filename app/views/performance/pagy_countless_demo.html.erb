@@ -1,0 +1,14 @@
+<h1>Pagy Countless テスト</h1>
+
+<h2>テスト内容: COUNTクエリなしのPagy最適化版</h2>
+
+<% if @duration %>
+  <p>データのみ: <%= sprintf('%.4f', @duration[:data_only] * 1000) %> ms</p>
+  <p>ナビゲーション含む: <%= sprintf('%.4f', @duration[:with_nav] * 1000) %> ms</p>
+<% end %>
+
+<% if @pagy && @articles %>
+  <p>ID一覧: <%= @articles.map(&:id).join(', ') %></p>
+  <%== pagy_nav(@pagy) %>
+<% end %>
+

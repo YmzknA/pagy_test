@@ -16,8 +16,4 @@ class PerformanceControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should get benchmark" do
-    get performance_benchmark_url
-    assert_response :success
-  end
 end

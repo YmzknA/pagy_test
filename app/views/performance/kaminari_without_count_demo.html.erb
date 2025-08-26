@@ -1,0 +1,18 @@
+<h1>Kaminari without_countテスト</h1>
+
+<h2>テスト内容: COUNTクエリなしKaminari最適化版</h2>
+
+<% if @duration %>
+  <p>データのみ: <%= sprintf('%.4f', @duration[:data_only] * 1000) %> ms</p>
+  <p>ナビゲーション含む: <%= sprintf('%.4f', @duration[:with_nav] * 1000) %> ms</p>
+<% end %>
+
+<% if @articles %>
+  <p>ID一覧: <%= @articles.map(&:id).join(', ') %></p>
+  <div>
+    <%= link_to_previous_page @articles, '前のページ' %>
+    <span>ページ <%= @articles.current_page %></span>
+    <%= link_to_next_page @articles, '次のページ' %>
+  </div>
+<% end %>
+
