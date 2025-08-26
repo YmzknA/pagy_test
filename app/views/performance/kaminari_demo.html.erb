@@ -9,21 +9,7 @@
   <p>Kaminari without_count (ビュー含む): <%= sprintf("%.4f", @duration[:with_view][1] * 1000) %> ms</p>
 <% end %>
 
-<% articles = local_assigns[:articles] || @articles %>
-
 <% if articles %>
   <p>ID一覧: <%= articles.map(&:id).join(', ') %></p>
-  <% begin %>
-    <%= paginate articles %>
-  <% rescue RuntimeError => e %>
-    <% if e.message.include?('non-count paginable scope') %>
-      <div>
-        <%= link_to_previous_page articles, '前のページ' %>
-        <span>ページ <%= articles.current_page %></span>
-        <%= link_to_next_page articles, '次のページ' %>
-      </div>
-    <% else %>
-      <p>Error: <%= e.message %></p>
-    <% end %>
-  <% end %>
+    <%= paginate(articles) %>
 <% end %>
