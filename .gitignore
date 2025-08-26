@@ -52,3 +52,6 @@ yarn-debug.log*
 
 # Ignore local secrets
 /tmp/local_secret.txt
+
+# Ignore work log directory
+work_log/
